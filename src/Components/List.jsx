@@ -1,21 +1,36 @@
-import * as React from "react";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import SendIcon from "@mui/icons-material/Send";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
-export default function ListComponent({ listName, cards }) {
+export default function ListComponent({ listName, id }) {
+    const [cards, setCards] = useState([]);
+    useEffect(() => {
+        async function fetchData() {
+            const data = await axios.get(
+                `${BASE_URL}1/list/${id}/cards?key=${
+                    import.meta.env.VITE_API_KEY
+                }&token=${import.meta.env.VITE_TOKEN}`
+            );
+            setCards(data.data);
+        }
+        fetchData();
+    }, []);
+
     return (
         <List
-            sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+            sx={{
+                height: "100%",
+                "&[data-active]": {
+                    backgroundColor: "action.selected",
+                    "&:hover": {
+                        backgroundColor: "action.selectedHover",
+                    },
+                },
+            }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
@@ -25,8 +40,7 @@ export default function ListComponent({ listName, cards }) {
             }
         >
             {cards.map((card) => (
-                <ListItemButton>
-                    <ListItemIcon></ListItemIcon>
+                <ListItemButton key={card.id}>
                     <ListItemText primary={card.name} />
                 </ListItemButton>
             ))}
