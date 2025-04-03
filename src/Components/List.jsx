@@ -1,14 +1,29 @@
-import ListSubheader from "@mui/material/ListSubheader";
-import List from "@mui/material/List";
+import { 
+    List, 
+    ListSubheader, 
+    TextField, 
+    Button, 
+    Card, 
+    CardContent, 
+    IconButton,
+    Box,
+    Checkbox,
+    Stack
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import TrelloCards from "./TrelloCards";
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 export default function ListComponent({ listName, id }) {
     const [cards, setCards] = useState([]);
     const [show, setShow] = useState(false);
     const [cardInput, setCardInput] = useState("");
+    
     useEffect(() => {
         async function fetchData() {
             const data = await axios.get(
@@ -16,7 +31,8 @@ export default function ListComponent({ listName, id }) {
                     import.meta.env.VITE_API_KEY
                 }&token=${import.meta.env.VITE_TOKEN}`
             );
-            setCards(data.data);
+            // Add completed status to each card
+            setCards(data.data.map(card => ({ ...card, completed: false })));
         }
         fetchData();
     }, []);
@@ -30,62 +46,149 @@ export default function ListComponent({ listName, id }) {
         let newCards = cards.filter((card) => card.id !== id);
         setCards(newCards);
     };
+    
     const addCard = async (name) => {
         const data = await axios.post(
             `${BASE_URL}1/cards/?idList=${id}&name=${name}&key=${
                 import.meta.env.VITE_API_KEY
             }&token=${import.meta.env.VITE_TOKEN}`
         );
-        setCards([...cards, data.data]);
+        setCards([...cards, { ...data.data, completed: false }]);
         setCardInput("");
         setShow(false);
     };
 
-    return (
-        <List
-            sx={{
-                height: "100%",
-                "&[data-active]": {
-                    backgroundColor: "action.selected",
-                    "&:hover": {
-                        backgroundColor: "action.selectedHover",
-                    },
-                },
-            }}
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
-                    {listName}
-                </ListSubheader>
-            }
-        >
-            {cards.map(({ id, name }) => (
-                <TrelloCards key={id} id={id} name={name} handleClick={deleteCard}/>
-            ))}
+    const toggleComplete = (cardId) => {
+        setCards(cards.map(card => 
+            card.id === cardId ? { ...card, completed: !card.completed } : card
+        ));
+    };
 
-            <div>
-                {show ? (
-                    <>
-                        <input
-                            type="text"
-                            value={cardInput}
-                            onChange={(e) => setCardInput(e.target.value)}
-                        />
-                        <button onClick={() => addCard(cardInput)}>Save</button>
-                        <button
-                            onClick={() => {
-                                setShow(false);
-                                setCardInput("");
-                            }}
+    return (
+        <Card
+            sx={{
+                width: 272,
+                bgcolor: '#ebecf0',
+                borderRadius: 2,
+                p: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+            }}
+        >
+            <ListSubheader 
+                sx={{
+                    fontWeight: 600,
+                    bgcolor: 'transparent',
+                    px: 1,
+                    py: 0.5,
+                }}
+            >
+                {listName}
+            </ListSubheader>
+            
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {cards.map(({ id, name, completed }) => (
+                    <Card 
+                        key={id} 
+                        sx={{
+                            bgcolor: 'white',
+                            boxShadow: '0 1px 0 rgba(9,30,66,.25)',
+                            borderRadius: 1,
+                            p: 1,
+                            '&:hover': {
+                                bgcolor: '#f4f5f7',
+                                '& .card-actions': {
+                                    visibility: 'visible',
+                                }
+                            },
+                            ...(completed && {
+                                bgcolor: '#f8f9fa',
+                                color: 'text.secondary',
+                                textDecoration: 'line-through',
+                            })
+                        }}
+                    >
+                        <CardContent sx={{ p: '8px !important' }}>
+                            <Stack direction="row" alignItems="flex-start" spacing={1}>
+                                <Checkbox
+                                    icon={<RadioButtonUncheckedIcon />}
+                                    checkedIcon={<CheckCircleOutlineIcon color="primary" />}
+                                    checked={completed}
+                                    onChange={() => toggleComplete(id)}
+                                    sx={{
+                                        p: 0,
+                                        '&:hover': {
+                                            bgcolor: 'transparent',
+                                        }
+                                    }}
+                                />
+                                <Box sx={{ 
+                                    wordBreak: 'break-word',
+                                    flexGrow: 1,
+                                    pt: '2px' // Align text with checkbox
+                                }}>
+                                    {name}
+                                </Box>
+                                <Box className="card-actions" sx={{ 
+                                    visibility: 'hidden',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    <IconButton 
+                                        size="small" 
+                                        onClick={() => deleteCard(id)}
+                                        sx={{ color: 'grey.600' }}
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            </Stack>
+                        </CardContent>
+                    </Card>
+                ))}
+            </Box>
+            
+            {show ? (
+                <Box sx={{ p: 1 }}>
+                    <TextField
+                        fullWidth
+                        autoFocus
+                        multiline
+                        minRows={2}
+                        value={cardInput}
+                        onChange={(e) => setCardInput(e.target.value)}
+                        placeholder="Enter a title for this card..."
+                        sx={{ mb: 1 }}
+                    />
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button 
+                            variant="contained" 
+                            onClick={() => addCard(cardInput)}
+                            disabled={!cardInput.trim()}
                         >
-                            Cancel
-                        </button>
-                    </>
-                ) : (
-                    <button onClick={() => setShow(true)}>Add Card</button>
-                )}
-            </div>
-        </List>
+                            Add Card
+                        </Button>
+                        <IconButton onClick={() => setShow(false)}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                </Box>
+            ) : (
+                <Button
+                    startIcon={<AddIcon />}
+                    onClick={() => setShow(true)}
+                    sx={{
+                        justifyContent: 'flex-start',
+                        color: 'text.secondary',
+                        '&:hover': {
+                            bgcolor: 'rgba(9,30,66,.08)',
+                        }
+                    }}
+                >
+                    Add a card
+                </Button>
+            )}
+        </Card>
     );
 }

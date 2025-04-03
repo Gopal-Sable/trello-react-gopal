@@ -38,7 +38,7 @@ export default function ModalComponent({ name }) {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                     />
-                    <button>create checkList</button>
+                    <button onClick={()=>{}}>create checkList</button>
                 </Box>
             </Modal>
         </div>
