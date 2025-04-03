@@ -9,15 +9,17 @@ import AddNewBoardModal from "./AddNewModal";
 const BoardList = () => {
     const navigate = useNavigate();
     const [boardsData, setBoardsData] = useState([]);
+    const [loading, setLoading] = useState(false);
     const handleSubmit = async (name) => {
         const data = await axios.post(
             `${BASE_URL}1/boards/?name=${name}&key=${
                 import.meta.env.VITE_API_KEY
             }&token=${import.meta.env.VITE_TOKEN}`
         );
-        setBoardsData([ ...boardsData, data.data ]);
+        setBoardsData([...boardsData, data.data]);
     };
     useEffect(() => {
+        setLoading(true)
         async function fetchData() {
             const data = await axios.get(
                 `${BASE_URL}1/members/me/boards?key=${
@@ -25,6 +27,7 @@ const BoardList = () => {
                 }&token=${import.meta.env.VITE_TOKEN}`
             );
             setBoardsData(data.data);
+            setLoading(false)
         }
         fetchData();
     }, []);
@@ -46,7 +49,7 @@ const BoardList = () => {
                 />
             </AddNewBoardModal>
 
-            {boardsData.map(({ id, name }) => {
+            { !loading && boardsData.map(({ id, name }) => {
                 return (
                     <Board
                         title={name}

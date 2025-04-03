@@ -4,6 +4,7 @@ import BoardPage from "./Pages/BoardPage";
 import HomePage from "./Pages/HomePage";
 
 function App() {
+    
     return (
         <>
             <BrowserRouter>

@@ -55,14 +55,14 @@ function Navbar() {
                         <IconButton
                             size="large"
                             aria-label="account of current user"
-                            aria-controls="menu-appbar"
+                            aria-controls="menu-appBar"
                             aria-haspopup="true"
                             color="inherit"
                         >
                             <MenuIcon />
                         </IconButton>
                         <Menu
-                            id="menu-appbar"
+                            id="menu-appBar"
                             anchorOrigin={{
                                 vertical: "bottom",
                                 horizontal: "left",
@@ -136,8 +136,8 @@ function Navbar() {
                                 sx={{ p: 0 }}
                             >
                                 <Avatar
-                                    alt="Remy Sharp"
-                                    src="/static/images/avatar/2.jpg"
+                                    alt="avatar"
+                                    src=""
                                 />
                             </IconButton>
                         </Tooltip>
