@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -9,12 +9,14 @@ import {
     Card,
     Checkbox,
     Input,
+    LinearProgress,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
 } from "@mui/material";
 import { checklistAPIs } from "../utils/apiCalls";
+import checklistReducer from "../Reducers/checklist";
 
 const key = import.meta.env.VITE_API_KEY;
 const token = import.meta.env.VITE_TOKEN;
@@ -34,17 +36,16 @@ export default function ChecklistModal({ name, cardId }) {
     const [open, setOpen] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [itemValue, setItemValue] = useState("");
-    const [checkListData, setCheckListData] = useState([]);
+    const [checkListData, dispatch] = useReducer(checklistReducer, []);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     useEffect(() => {
         async function getChecklist(id) {
             const data = await checklistAPIs.getChecklists(id);
-            setCheckListData(data);
+            dispatch({ type: "SET_CHECKLISTS", payload: data });
         }
         getChecklist(cardId);
     }, []);
-    // https://api.trello.com/1/cards/{id}/checklists?key=APIKey&token=APIToken
     const createChecklist = async () => {
         const { data } = await axios.post(
             `${BASE_URL}1/cards/${cardId}/checklists`,
@@ -53,47 +54,42 @@ export default function ChecklistModal({ name, cardId }) {
                 params: { key, token, name: inputValue },
             }
         );
-        setCheckListData([...checkListData, data]);
+        dispatch({ type: "ADD_CHECKLIST", payload: data });
     };
     const deleteChecklist = async (id) => {
         const { data } = await axios.delete(`${BASE_URL}1/checklists/${id}`, {
             params: { key, token },
         });
-        setCheckListData(
-            checkListData.filter((checklist) => id !== checklist.id)
-        );
+
+        dispatch({ type: "REMOVE_CHECKLISTS", payload: id });
     };
 
-    const checkedItem = async () => {
-        // const { data } = await axios.delete(`${BASE_URL}1/checklists/${id}`, {
-        //     params: { key, token },
-        // });
-        // setCheckListData();
+    const checkedItem = async (state, cardId, checkItemId) => {
+        const { data } = await axios.put(
+            `${BASE_URL}1/cards/${cardId}/checkItem/${checkItemId}`,
+            null,
+            {
+                params: {
+                    state: state == "complete" ? "incomplete" : "complete",
+                    key,
+                    token,
+                },
+            }
+        );
+            // CREATE THIS 
+        // dispatch({type:"REMOVE_CHECKLISTS",payload:id})
+        // setCheckListData(checkListData.map((list)=>))
     };
     const deleteItem = async (id, checkedId) => {
-        // https://api.trello.com/1/checklists/{id}/checkItems/{idCheckItem}?
         const { data } = await axios.delete(
             `${BASE_URL}1/checklists/${id}/checkItems/${checkedId}`,
             {
                 params: { key, token },
             }
         );
-
-        setCheckListData(
-            checkListData.map((checklist) =>
-                checklist.id === id
-                    ? {
-                          ...checklist,
-                          checkItems: checklist.checkItems.filter(
-                              (item) => item.id !== checkedId
-                          ),
-                      }
-                    : checklist
-            )
-        );
+        dispatch({ action: "DELETE_ITEM", payload: { id, checkedId } });
     };
     const createItem = async (id) => {
-        // https://api.trello.com/1/checklists/{id}/checkItems?name={name}
         const { data } = await axios.post(
             `${BASE_URL}1/checklists/${id}/checkItems`,
             null,
@@ -101,13 +97,7 @@ export default function ChecklistModal({ name, cardId }) {
                 params: { key, token, name: itemValue },
             }
         );
-        setCheckListData(
-            checkListData.map((list) =>
-                list.id === id
-                    ? { ...list, checkItems: [...list.checkItems, data] }
-                    : list
-            )
-        );
+        dispatch({ action: "CREATE_ITEM", payload: { id, data } });
     };
     return (
         <div>
@@ -136,54 +126,60 @@ export default function ChecklistModal({ name, cardId }) {
                                     flexDirection: "column",
                                 }}
                             >
-                                <ListItemButton>
-                                    <ListItemText primary={name} />
-                                    <List>
-                                        {checkItems.map(
-                                            ({
-                                                id: checkedId,
-                                                name,
-                                                state,
-                                            }) => {
-                                                return (
-                                                    <ListItem key={checkedId}>
-                                                        <Checkbox
-                                                            checked={
-                                                                state ===
-                                                                "complete"
-                                                            }
-                                                            onChange={() => {}}
-                                                            sx={{
-                                                                p: 0,
-                                                                zIndex:10,
-                                                                "&:hover": {
-                                                                    bgcolor:
-                                                                        "transparent",
-                                                                },
-                                                            }}
-                                                        />
-                                                        <ListItemText
-                                                            primary={name}
-                                                        />
-                                                        <Button
-                                                            sx={{
-                                                                zIndex: "10",
-                                                            }}
-                                                            onClick={() =>
-                                                                deleteItem(
-                                                                    id,
-                                                                    checkedId
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete Item
-                                                        </Button>
-                                                    </ListItem>
-                                                );
-                                            }
-                                        )}
-                                    </List>
-                                </ListItemButton>
+                                <Box sx={{ width: "100%" }}>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={50}
+                                    />
+                                </Box>
+                                <ListItemText primary={name} />
+
+                                <List>
+                                    {checkItems.map(
+                                        ({ id: checkedId, name, state }) => {
+                                            return (
+                                                <ListItem key={checkedId}>
+                                                    <Checkbox
+                                                        checked={
+                                                            state === "complete"
+                                                        }
+                                                        onChange={() => {
+                                                            checkedItem(
+                                                                state,
+                                                                cardId,
+                                                                checkedId
+                                                            );
+                                                        }}
+                                                        sx={{
+                                                            p: 0,
+                                                            zIndex: 10,
+                                                            "&:hover": {
+                                                                bgcolor:
+                                                                    "transparent",
+                                                            },
+                                                        }}
+                                                    />
+                                                    <ListItemText
+                                                        primary={name}
+                                                    />
+                                                    <Button
+                                                        sx={{
+                                                            zIndex: "10",
+                                                        }}
+                                                        onClick={() =>
+                                                            deleteItem(
+                                                                id,
+                                                                checkedId
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete Item
+                                                    </Button>
+                                                </ListItem>
+                                            );
+                                        }
+                                    )}
+                                </List>
                                 <Input
                                     value={itemValue}
                                     onChange={(e) =>

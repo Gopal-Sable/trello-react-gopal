@@ -1,30 +1,31 @@
 import { Box, Skeleton, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router";
 import AddNewBoardModal from "./AddNewModal";
 import AddIcon from "@mui/icons-material/Add";
 import { boardAPIs } from "../utils/apiCalls";
+import boardsReducer from "../Reducers/boards";
 
 const BoardList = () => {
     const navigate = useNavigate();
-    const [boards, setBoards] = useState([]);
+    const [boards, dispatch] = useReducer(boardsReducer, []);
     const [loading, setLoading] = useState(true);
 
     const createBoard = async (name) => {
         const { data, error } = await boardAPIs.createBoard(name);
         if (error) {
-            return alert("Error creating board",error)
+            return alert("Error creating board", error);
         }
-        setBoards([...boards, data]);
+        dispatch({ type: "ADD_BOARD", payload: data });
     };
 
     useEffect(() => {
         (async () => {
             try {
                 const { data } = await boardAPIs.getAllBoards();
-                setBoards(data);
+                dispatch({ type: "SET_BOARDS", payload: data });
             } catch (error) {
                 console.error("Fetch error:", error);
             } finally {
