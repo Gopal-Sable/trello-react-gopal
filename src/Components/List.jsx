@@ -1,29 +1,31 @@
-import { 
-    List, 
-    ListSubheader, 
-    TextField, 
-    Button, 
-    Card, 
-    CardContent, 
+import {
+    List,
+    ListSubheader,
+    TextField,
+    Button,
+    Card,
+    CardContent,
     IconButton,
     Box,
     Checkbox,
-    Stack
+    Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { checklistAPIs } from "../utils/apiCalls";
+import ChecklistModal from "./ChecklistModal";
 
 export default function ListComponent({ listName, id }) {
     const [cards, setCards] = useState([]);
     const [show, setShow] = useState(false);
     const [cardInput, setCardInput] = useState("");
-    
+
     useEffect(() => {
         async function fetchData() {
             const data = await axios.get(
@@ -31,8 +33,7 @@ export default function ListComponent({ listName, id }) {
                     import.meta.env.VITE_API_KEY
                 }&token=${import.meta.env.VITE_TOKEN}`
             );
-            // Add completed status to each card
-            setCards(data.data.map(card => ({ ...card, completed: false })));
+            setCards(data.data);
         }
         fetchData();
     }, []);
@@ -46,99 +47,125 @@ export default function ListComponent({ listName, id }) {
         let newCards = cards.filter((card) => card.id !== id);
         setCards(newCards);
     };
-    
+
     const addCard = async (name) => {
         const data = await axios.post(
             `${BASE_URL}1/cards/?idList=${id}&name=${name}&key=${
                 import.meta.env.VITE_API_KEY
             }&token=${import.meta.env.VITE_TOKEN}`
         );
-        setCards([...cards, { ...data.data, completed: false }]);
+        setCards([...cards, { ...data.data }]);
         setCardInput("");
         setShow(false);
     };
 
-    const toggleComplete = (cardId) => {
-        setCards(cards.map(card => 
-            card.id === cardId ? { ...card, completed: !card.completed } : card
-        ));
+    const toggleComplete = async (cardId, dueComplete) => {
+        const data = await axios.put(
+            `${BASE_URL}1/cards/${cardId}?dueComplete=${dueComplete}&key=${
+                import.meta.env.VITE_API_KEY
+            }&token=${import.meta.env.VITE_TOKEN}`
+        );
+        setCards(
+            cards.map((card) =>
+                card.id === cardId ? { ...card, dueComplete } : card
+            )
+        );
     };
+ 
 
     return (
         <Card
             sx={{
                 width: 272,
-                bgcolor: '#ebecf0',
+                bgcolor: "#ebecf0",
                 borderRadius: 2,
                 p: 1,
-                display: 'flex',
-                flexDirection: 'column',
+                display: "flex",
+                flexDirection: "column",
                 gap: 1,
             }}
         >
-            <ListSubheader 
+            <ListSubheader
                 sx={{
                     fontWeight: 600,
-                    bgcolor: 'transparent',
+                    bgcolor: "transparent",
                     px: 1,
                     py: 0.5,
                 }}
             >
                 {listName}
             </ListSubheader>
-            
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {cards.map(({ id, name, completed }) => (
-                    <Card 
-                        key={id} 
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {cards.map(({ id, name, dueComplete }) => (
+                    <Card
+                        key={id}
                         sx={{
-                            bgcolor: 'white',
-                            boxShadow: '0 1px 0 rgba(9,30,66,.25)',
+                            bgcolor: "white",
+                            boxShadow: "0 1px 0 rgba(9,30,66,.25)",
                             borderRadius: 1,
                             p: 1,
-                            '&:hover': {
-                                bgcolor: '#f4f5f7',
-                                '& .card-actions': {
-                                    visibility: 'visible',
-                                }
+                            "&:hover": {
+                                bgcolor: "#f4f5f7",
+                                "& .card-actions": {
+                                    visibility: "visible",
+                                },
                             },
-                            ...(completed && {
-                                bgcolor: '#f8f9fa',
-                                color: 'text.secondary',
-                                textDecoration: 'line-through',
-                            })
+                            ...(dueComplete && {
+                                bgcolor: "#f8f9fa",
+                                color: "text.secondary",
+                                textDecoration: "line-through",
+                            }),
                         }}
                     >
-                        <CardContent sx={{ p: '8px !important' }}>
-                            <Stack direction="row" alignItems="flex-start" spacing={1}>
+                        <CardContent sx={{ p: "8px !important" }}>
+                            <Stack
+                                direction="row"
+                                alignItems="flex-start"
+                                spacing={1}
+                            >
                                 <Checkbox
                                     icon={<RadioButtonUncheckedIcon />}
-                                    checkedIcon={<CheckCircleOutlineIcon color="primary" />}
-                                    checked={completed}
-                                    onChange={() => toggleComplete(id)}
+                                    checkedIcon={
+                                        <CheckCircleOutlineIcon color="primary" />
+                                    }
+                                    checked={dueComplete}
+                                    onChange={() =>
+                                        toggleComplete(id, !dueComplete)
+                                    }
                                     sx={{
                                         p: 0,
-                                        '&:hover': {
-                                            bgcolor: 'transparent',
-                                        }
+                                        "&:hover": {
+                                            bgcolor: "transparent",
+                                        },
                                     }}
                                 />
-                                <Box sx={{ 
-                                    wordBreak: 'break-word',
-                                    flexGrow: 1,
-                                    pt: '2px' // Align text with checkbox
-                                }}>
+                                <Box
+                                    sx={{
+                                        wordBreak: "break-word",
+                                        flexGrow: 1,
+                                        pt: "2px",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <ChecklistModal
+                                        cardId={id}
+                                        name={"open"}
+                                    />
                                     {name}
                                 </Box>
-                                <Box className="card-actions" sx={{ 
-                                    visibility: 'hidden',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}>
-                                    <IconButton 
-                                        size="small" 
+                                <Box
+                                    className="card-actions"
+                                    sx={{
+                                        visibility: "hidden",
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <IconButton
+                                        size="small"
                                         onClick={() => deleteCard(id)}
-                                        sx={{ color: 'grey.600' }}
+                                        sx={{ color: "grey.600" }}
                                     >
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -148,7 +175,7 @@ export default function ListComponent({ listName, id }) {
                     </Card>
                 ))}
             </Box>
-            
+
             {show ? (
                 <Box sx={{ p: 1 }}>
                     <TextField
@@ -161,9 +188,9 @@ export default function ListComponent({ listName, id }) {
                         placeholder="Enter a title for this card..."
                         sx={{ mb: 1 }}
                     />
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button 
-                            variant="contained" 
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                        <Button
+                            variant="contained"
                             onClick={() => addCard(cardInput)}
                             disabled={!cardInput.trim()}
                         >
@@ -179,11 +206,11 @@ export default function ListComponent({ listName, id }) {
                     startIcon={<AddIcon />}
                     onClick={() => setShow(true)}
                     sx={{
-                        justifyContent: 'flex-start',
-                        color: 'text.secondary',
-                        '&:hover': {
-                            bgcolor: 'rgba(9,30,66,.08)',
-                        }
+                        justifyContent: "flex-start",
+                        color: "text.secondary",
+                        "&:hover": {
+                            bgcolor: "rgba(9,30,66,.08)",
+                        },
                     }}
                 >
                     Add a card

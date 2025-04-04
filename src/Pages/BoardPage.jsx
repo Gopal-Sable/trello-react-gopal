@@ -49,6 +49,7 @@ const BoardPage = () => {
 
     return (
         <>
+        <Button ></Button>
             <Box
                 sx={{
                     display: "flex",
@@ -113,7 +114,7 @@ const BoardPage = () => {
                                 position: "absolute",
                                 right: 8,
                                 top: 8,
-                                zIndex: 1,
+                                zIndex: 10,
                                 color: "grey.600",
                                 "&:hover": {
                                     color: "error.main",

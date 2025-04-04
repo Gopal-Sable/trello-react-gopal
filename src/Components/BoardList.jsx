@@ -13,7 +13,10 @@ const BoardList = () => {
     const [loading, setLoading] = useState(true);
 
     const createBoard = async (name) => {
-        const { data } = await boardAPIs.createBoard(name);
+        const { data, error } = await boardAPIs.createBoard(name);
+        if (error) {
+            return alert("Error creating board",error)
+        }
         setBoards([...boards, data]);
     };
 

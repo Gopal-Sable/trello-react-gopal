@@ -67,7 +67,7 @@ export const boardAPIs = {
     },
     async getAllBoards() {
         try {
-            const { data } = await axios.get(`${BASE_URL}1/members/me/boards`,{
+            const { data } = await axios.get(`${BASE_URL}1/members/me/boards`, {
                 params: {
                     key,
                     token,
@@ -78,5 +78,82 @@ export const boardAPIs = {
             console.error("Error :", error);
             return { error: "Error creating board" };
         }
+    },
+};
+
+export const cardAPIs = {
+    async getAllCards(id) {
+        try {
+            const { data } = await axios.get(`${BASE_URL}1/list/${id}/cards`, {
+                params: {
+                    key,
+                    token,
+                },
+            });
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error fetching cards" };
+        }
+    },
+    async deleteCard(id) {
+        try {
+            const { data } = await axios.delete(`${BASE_URL}1/cards/${id}`, {
+                params: {
+                    key,
+                    token,
+                },
+            });
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error deleting card" };
+        }
+    },
+    async addCard(id, name) {
+        try {
+            const { data } = await axios.post(`${BASE_URL}1/cards/`, null, {
+                params: {
+                    idList: id,
+                    name,
+                    key,
+                    token,
+                },
+            });
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error deleting card" };
+        }
+    },
+    async toggleComplete(cardId, dueComplete) {
+        try {
+            const { data } = await axios.put(
+                `${BASE_URL}1/cards/${cardId}`,
+                null,
+                {
+                    params: {
+                        dueComplete,
+                        key,
+                        token,
+                    },
+                }
+            );
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error deleting card" };
+        }
+    },
+};
+export const checklistAPIs = {
+    async getChecklists(id) {
+        const { data } = await axios.get(
+            `${BASE_URL}1/cards/${id}/checklists`,
+            {
+                params: { key, token },
+            }
+        );
+        return data;
     },
 };
