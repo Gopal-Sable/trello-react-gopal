@@ -28,10 +28,6 @@ function Navbar() {
                         variant="h6"
                         noWrap
                         component={Link}
-                        // onClick={(e) => {
-                        //     e.preventDefault();
-                        //     navigate("/");
-                        // }}
                         to="/"
                         sx={{
                             mr: 2,

@@ -10,7 +10,7 @@ import {
     Checkbox,
     Stack,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,60 +18,39 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { checklistAPIs } from "../utils/apiCalls";
 import ChecklistModal from "./ChecklistModal";
+import cardsReducer from "../Reducers/cards";
+import { cardAPIs } from "../utils/apiCalls";
 
 export default function ListComponent({ listName, id }) {
-    const [cards, setCards] = useState([]);
+    const [cards, dispatch] = useReducer(cardsReducer, []);
     const [show, setShow] = useState(false);
     const [cardInput, setCardInput] = useState("");
 
     useEffect(() => {
         async function fetchData() {
-            const data = await axios.get(
-                `${BASE_URL}1/list/${id}/cards?key=${
-                    import.meta.env.VITE_API_KEY
-                }&token=${import.meta.env.VITE_TOKEN}`
-            );
-            setCards(data.data);
+            const { data } = await cardAPIs.getAllCards(id);
+            dispatch({ type: "SET_CARDS", payload: data });
         }
         fetchData();
     }, []);
 
     const deleteCard = async (id) => {
-        const data = await axios.delete(
-            `${BASE_URL}1/cards/${id}?&key=${
-                import.meta.env.VITE_API_KEY
-            }&token=${import.meta.env.VITE_TOKEN}`
-        );
-        let newCards = cards.filter((card) => card.id !== id);
-        setCards(newCards);
+        await cardAPIs.deleteCard(id);
+        dispatch({ type: "REMOVE_CARD", payload: id });
     };
 
     const addCard = async (name) => {
-        const data = await axios.post(
-            `${BASE_URL}1/cards/?idList=${id}&name=${name}&key=${
-                import.meta.env.VITE_API_KEY
-            }&token=${import.meta.env.VITE_TOKEN}`
-        );
-        setCards([...cards, { ...data.data }]);
+        const { data } = await cardAPIs.addCard(id, name);
+        dispatch({ type: "ADD_CARD", payload: data });
         setCardInput("");
         setShow(false);
     };
 
     const toggleComplete = async (cardId, dueComplete) => {
-        const data = await axios.put(
-            `${BASE_URL}1/cards/${cardId}?dueComplete=${dueComplete}&key=${
-                import.meta.env.VITE_API_KEY
-            }&token=${import.meta.env.VITE_TOKEN}`
-        );
-        setCards(
-            cards.map((card) =>
-                card.id === cardId ? { ...card, dueComplete } : card
-            )
-        );
+        const data = await cardAPIs.toggleComplete(cardId, dueComplete);
+        dispatch({ type: "CHECK_CARD", payload: cardId });
     };
- 
 
     return (
         <Card
@@ -148,10 +127,7 @@ export default function ListComponent({ listName, id }) {
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <ChecklistModal
-                                        cardId={id}
-                                        name={"open"}
-                                    />
+                                    <ChecklistModal cardId={id} name={"open"} />
                                     {name}
                                 </Box>
                                 <Box

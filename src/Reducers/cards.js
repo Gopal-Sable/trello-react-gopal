@@ -5,7 +5,7 @@ export default function cardsReducer(state, action) {
             return action.payload;
         case "ADD_CARD":
             return [...state, action.payload];
-        case "REMOVE_CARDS":
+        case "REMOVE_CARD":
             return state.filter((card) => card.id !== action.payload);
         case "CHECK_CARD":
             return state.map((card) =>

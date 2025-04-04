@@ -1,15 +1,12 @@
 import { Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import { useNavigate } from "react-router";
 import AddNewBoardModal from "./AddNewModal";
 import AddIcon from "@mui/icons-material/Add";
 import { boardAPIs } from "../utils/apiCalls";
 import boardsReducer from "../Reducers/boards";
+import BoardCard from "./BoardCard";
 
 const BoardList = () => {
-    const navigate = useNavigate();
     const [boards, dispatch] = useReducer(boardsReducer, []);
     const [loading, setLoading] = useState(true);
 
@@ -34,40 +31,6 @@ const BoardList = () => {
         })();
     }, []);
 
-    const BoardCard = ({ id, name, prefs }) => (
-        <Box
-            onClick={() => navigate(`/board/${id}`)}
-            sx={{
-                height: 120,
-                width: 200,
-                borderRadius: 2,
-                p: 2,
-                cursor: "pointer",
-                boxShadow: 1,
-                position: "relative",
-                overflow: "hidden",
-                backgroundSize: "cover",
-                backgroundImage: prefs?.backgroundImage
-                    ? `url(${prefs.backgroundImage})`
-                    : undefined,
-                backgroundColor: prefs?.backgroundColor || "#0079bf",
-            }}
-        >
-            <Typography
-                sx={{
-                    color: "#fff",
-                    fontWeight: 600,
-                    position: "relative",
-                    zIndex: 1,
-                    textShadow: prefs?.backgroundImage
-                        ? "0 1px 3px rgba(0,0,0,0.8)"
-                        : "none",
-                }}
-            >
-                {name}
-            </Typography>
-        </Box>
-    );
 
     return (
         <Box sx={{ p: 4, minHeight: "100vh", bgcolor: "grey.100" }}>
