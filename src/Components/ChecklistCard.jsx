@@ -11,6 +11,7 @@ import { ChecklistItem } from "./ChecklistItem";
 import { checklistAPIs } from "../utils/apiCalls";
 import { useState } from "react";
 
+//  this is  checklist
 export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
     const [newItemName, setNewItemName] = useState("");
     const [isLoading, setIsLoading] = useState({
@@ -73,6 +74,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                 }}
             >
                 <Typography variant="subtitle1">{checklist.name}</Typography>
+                {/* delete a checklist */}
                 <Button
                     size="small"
                     color="error"
@@ -82,6 +84,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                     Delete
                 </Button>
             </Box>
+            {/* Show all check-items */}
             <List dense>
                 {checklist.checkItems?.length === 0 ? (
                     <Typography variant="body2" sx={{ px: 2, py: 1 }}>
@@ -99,6 +102,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                     ))
                 )}
             </List>
+            {/* Add new check-item */}
             <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
                 <Input
                     fullWidth

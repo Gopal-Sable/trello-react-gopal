@@ -1,4 +1,4 @@
-import { Box, Button, IconButton} from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import ListComponent from "../Components/List";
 import { useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router";
@@ -49,7 +49,7 @@ const BoardPage = () => {
 
     return (
         <>
-        <Button ></Button>
+            <Button></Button>
             <Box
                 sx={{
                     display: "flex",
@@ -98,7 +98,7 @@ const BoardPage = () => {
                             }}
                         />
                     ))}
-
+                {/* showing lists on a boards page */}
                 {lists.map(({ name, id }) => (
                     <Box
                         key={id}
@@ -108,6 +108,7 @@ const BoardPage = () => {
                             flexShrink: 0,
                         }}
                     >
+                        {/* delete a list  */}
                         <IconButton
                             onClick={() => handleArchive(id)}
                             sx={{
@@ -124,6 +125,7 @@ const BoardPage = () => {
                         >
                             <ArchiveIcon fontSize="small" />
                         </IconButton>
+                        {/* list with cards */}
                         <ListComponent listName={name} id={id} />
                     </Box>
                 ))}

@@ -82,6 +82,7 @@ const CardComponent = ({ id, name, dueComplete, dispatch }) => {
                             alignItems: "center",
                         }}
                     >
+                        {/* delete the card */}
                         <IconButton
                             loading={isLoading}
                             size="small"

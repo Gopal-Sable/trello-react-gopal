@@ -76,6 +76,7 @@ const BoardList = () => {
                               sx={{ borderRadius: 2 }}
                           />
                       ))
+                    //   showing all boards
                     : boards.map((board) => (
                           <BoardCard key={board.id} {...board} />
                       ))}

@@ -66,7 +66,7 @@ export default function ListComponent({ listName, id }) {
             >
                 {listName}
             </ListSubheader>
-
+            {/* showing cards on list */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {cards.map(({ id, name, dueComplete }) => (
                     <CardComponent
@@ -78,7 +78,7 @@ export default function ListComponent({ listName, id }) {
                     />
                 ))}
             </Box>
-
+            {/* add a card on list */}
             {show ? (
                 <Box sx={{ p: 1 }}>
                     <TextField

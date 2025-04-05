@@ -41,7 +41,7 @@ const ChecklistModal = ({ cardId, name }) => {
             const fetchData = async () => {
                 try {
                     setIsLoading((prev) => ({ ...prev, data: true }));
-                    const {data} = await checklistAPIs.getChecklists(cardId);
+                    const { data } = await checklistAPIs.getChecklists(cardId);
                     dispatch({ type: "SET_DATA", payload: data });
                 } catch (err) {
                     setError("Failed to load checklists");
@@ -61,7 +61,7 @@ const ChecklistModal = ({ cardId, name }) => {
         }
         try {
             setIsLoading((prev) => ({ ...prev, creteList: true }));
-            const {data} = await checklistAPIs.createChecklist(
+            const { data } = await checklistAPIs.createChecklist(
                 cardId,
                 newChecklistName
             );
@@ -91,7 +91,7 @@ const ChecklistModal = ({ cardId, name }) => {
                         </Typography>
                     )}
                     {isLoading.data && <LinearProgress sx={{ mb: 2 }} />}
-
+                    {/* Add a Checklist  */}
                     <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                         <Input
                             fullWidth
@@ -114,6 +114,7 @@ const ChecklistModal = ({ cardId, name }) => {
                         </Button>
                     </Box>
 
+                    {/* display all checklists  */}
                     <List sx={{ width: "100%" }}>
                         {checkListData.length === 0 && !isLoading.data && (
                             <Typography sx={{ textAlign: "center", py: 2 }}>
