@@ -4,27 +4,41 @@ export default function checklistReducer(state, action) {
             return action.payload;
         case "ADD_CHECKLIST":
             return [...state, action.payload];
-        case "REMOVE_CHECKLISTS":
+        case "REMOVE_CHECKLIST":
             return state.filter((checklist) => checklist.id !== action.payload);
-        // case "CHECK_CHECKLIST":
-        //     return state.map((checklist) =>
-        //         checklist.id === action.payload ? { ...checklist, dueComplete:!checklist.dueComplete } : checklist
-        //     );
+        case "TOGGLE_CHECKITEM":
+            return state.map(checklist => {
+                if (checklist.id === action.payload.checklistId) {
+                    return {
+                        ...checklist,
+                        checkItems: checklist.checkItems.map(item => {
+                            if (item.id === action.payload.checkItemId) {
+                                return {
+                                    ...item,
+                                    state: item.state === 'complete' ? 'incomplete' : 'complete'
+                                };
+                            }
+                            return item;
+                        })
+                    };
+                }
+                return checklist;
+            });
         case "DELETE_ITEM":
             return state.map((checklist) =>
-                        checklist.id === payload.id
+                        checklist.id === action.payload.id
                             ? {
                                   ...checklist,
                                   checkItems: checklist.checkItems.filter(
-                                      (item) => item.id !== payload.checkedId
+                                      (item) => item.id !== action.payload.checkedId
                                   ),
                               }
                             : checklist
                     )
         case "CREATE_ITEM":
             return   state.map((list) =>
-                        list.id === payload.id
-                            ? { ...list, checkItems: [...list.checkItems, payload.data] }
+                        list.id === action.payload.id
+                            ? { ...list, checkItems: [...list.checkItems, action.payload.data] }
                             : list
                     )
         default:

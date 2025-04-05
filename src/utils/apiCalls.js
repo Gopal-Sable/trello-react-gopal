@@ -156,4 +156,43 @@ export const checklistAPIs = {
         );
         return data;
     },
+
+    async createChecklist(cardId, name) {
+        const response = await axios.post(
+            `${BASE_URL}1/cards/${cardId}/checklists`,
+            { name },
+            { params: { key, token } }
+        );
+        return response.data;
+    },
+
+    async deleteChecklist(checklistId) {
+        await axios.delete(`${BASE_URL}1/checklists/${checklistId}`, {
+            params: { key, token },
+        });
+    },
+
+    async toggleChecklistItem(cardId, checklistId, checkItemId, currentState) {
+        await axios.put(
+            `${BASE_URL}1/cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
+            { state: currentState === "complete" ? "incomplete" : "complete" },
+            { params: { key, token } }
+        );
+    },
+
+    async deleteChecklistItem(checklistId, checkItemId) {
+        await axios.delete(
+            `${BASE_URL}1/checklists/${checklistId}/checkItems/${checkItemId}`,
+            { params: { key, token } }
+        );
+    },
+
+    async createChecklistItem(checklistId, name) {
+        const response = await axios.post(
+            `${BASE_URL}1/checklists/${checklistId}/checkItems`,
+            { name },
+            { params: { key, token } }
+        );
+        return response.data;
+    },
 };

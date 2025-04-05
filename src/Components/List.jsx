@@ -119,17 +119,9 @@ export default function ListComponent({ listName, id }) {
                                         },
                                     }}
                                 />
-                                <Box
-                                    sx={{
-                                        wordBreak: "break-word",
-                                        flexGrow: 1,
-                                        pt: "2px",
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <ChecklistModal cardId={id} name={"open"} />
-                                    {name}
-                                </Box>
+                                
+                                <ChecklistModal cardId={id} name={name}/>
+                                   
                                 <Box
                                     className="card-actions"
                                     sx={{
