@@ -1,5 +1,13 @@
 import { useEffect, useReducer, useState } from "react";
-import { Box, Modal, Input, LinearProgress, List, Typography, Button } from "@mui/material";
+import {
+    Box,
+    Modal,
+    Input,
+    LinearProgress,
+    List,
+    Typography,
+    Button,
+} from "@mui/material";
 import { ChecklistCard } from "./ChecklistCard";
 import { checklistAPIs } from "../utils/apiCalls";
 import checklistReducer from "../Reducers/checklist";
@@ -20,7 +28,10 @@ const modalStyle = {
 
 const ChecklistModal = ({ cardId, name }) => {
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState({
+        data: false,
+        creteList: false,
+    });
     const [error, setError] = useState(null);
     const [checkListData, dispatch] = useReducer(checklistReducer, []);
     const [newChecklistName, setNewChecklistName] = useState("");
@@ -28,15 +39,15 @@ const ChecklistModal = ({ cardId, name }) => {
     useEffect(() => {
         if (open && cardId) {
             const fetchData = async () => {
-                setLoading(true);
                 try {
-                    const data = await checklistAPIs.getChecklists(cardId);
+                    setIsLoading((prev) => ({ ...prev, data: true }));
+                    const {data} = await checklistAPIs.getChecklists(cardId);
                     dispatch({ type: "SET_CHECKLISTS", payload: data });
                 } catch (err) {
                     setError("Failed to load checklists");
                     console.error(err);
                 } finally {
-                    setLoading(false);
+                    setIsLoading((prev) => ({ ...prev, data: false }));
                 }
             };
             fetchData();
@@ -49,12 +60,18 @@ const ChecklistModal = ({ cardId, name }) => {
             return;
         }
         try {
-            const data = await checklistAPIs.createChecklist(cardId, newChecklistName);
+            setIsLoading((prev) => ({ ...prev, creteList: true }));
+            const {data} = await checklistAPIs.createChecklist(
+                cardId,
+                newChecklistName
+            );
             dispatch({ type: "ADD_CHECKLIST", payload: data });
-            setNewChecklistName("");
         } catch (err) {
             setError("Failed to create checklist");
             console.error(err);
+        } finally {
+            setNewChecklistName("");
+            setIsLoading((prev) => ({ ...prev, creteList: false }));
         }
     };
 
@@ -65,30 +82,43 @@ const ChecklistModal = ({ cardId, name }) => {
             </Box>
             <Modal open={open} onClose={() => setOpen(false)}>
                 <Box sx={modalStyle}>
-                    <Typography variant="h6" gutterBottom>Checklist Manager</Typography>
-                    {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
-                    {loading && <LinearProgress sx={{ mb: 2 }} />}
+                    <Typography variant="h6" gutterBottom>
+                        Checklist Manager
+                    </Typography>
+                    {error && (
+                        <Typography color="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Typography>
+                    )}
+                    {isLoading.data && <LinearProgress sx={{ mb: 2 }} />}
 
                     <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                         <Input
                             fullWidth
                             placeholder="New checklist name"
                             value={newChecklistName}
-                            onChange={(e) => setNewChecklistName(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleCreateChecklist()}
+                            onChange={(e) =>
+                                setNewChecklistName(e.target.value)
+                            }
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && handleCreateChecklist()
+                            }
                         />
                         <Button
                             variant="contained"
                             onClick={handleCreateChecklist}
                             disabled={!newChecklistName.trim()}
+                            loading={isLoading.creteList}
                         >
                             Add
                         </Button>
                     </Box>
 
                     <List sx={{ width: "100%" }}>
-                        {checkListData.length === 0 && !loading && (
-                            <Typography sx={{ textAlign: 'center', py: 2 }}>No checklists found</Typography>
+                        {checkListData.length === 0 && !isLoading.data && (
+                            <Typography sx={{ textAlign: "center", py: 2 }}>
+                                No checklists found
+                            </Typography>
                         )}
                         {checkListData.map((checklist) => (
                             <ChecklistCard

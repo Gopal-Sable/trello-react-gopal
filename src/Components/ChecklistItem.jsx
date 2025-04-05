@@ -1,6 +1,6 @@
 import { ListItem, Checkbox, ListItemText, Button } from "@mui/material";
 
-export const ChecklistItem = ({ item, onToggle, onDelete }) => (
+export const ChecklistItem = ({ item, onToggle, onDelete, isLoading }) => (
     <ListItem sx={{ p: 0, "&:hover": { backgroundColor: "action.hover" } }}>
         <Checkbox
             checked={item.state === "complete"}
@@ -18,7 +18,12 @@ export const ChecklistItem = ({ item, onToggle, onDelete }) => (
                         : "text.primary",
             }}
         />
-        <Button size="small" color="error" onClick={onDelete}>
+        <Button
+            size="small"
+            color="error"
+            loading={isLoading.itemDelete}
+            onClick={onDelete}
+        >
             Delete
         </Button>
     </ListItem>

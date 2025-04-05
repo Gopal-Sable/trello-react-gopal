@@ -148,51 +148,87 @@ export const cardAPIs = {
 };
 export const checklistAPIs = {
     async getChecklists(id) {
-        const { data } = await axios.get(
-            `${BASE_URL}1/cards/${id}/checklists`,
-            {
-                params: { key, token },
-            }
-        );
-        return data;
+        try {
+            const { data } = await axios.get(
+                `${BASE_URL}1/cards/${id}/checklists`,
+                {
+                    params: { key, token },
+                }
+            );
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error fetching checklist" };
+        }
     },
 
     async createChecklist(cardId, name) {
-        const response = await axios.post(
-            `${BASE_URL}1/cards/${cardId}/checklists`,
-            { name },
-            { params: { key, token } }
-        );
-        return response.data;
+        try {
+            const { data } = await axios.post(
+                `${BASE_URL}1/cards/${cardId}/checklists`,
+                { name },
+                { params: { key, token } }
+            );
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error creating checklist" };
+        }
     },
 
     async deleteChecklist(checklistId) {
-        await axios.delete(`${BASE_URL}1/checklists/${checklistId}`, {
-            params: { key, token },
-        });
+        try {
+            await axios.delete(`${BASE_URL}1/checklists/${checklistId}`, {
+                params: { key, token },
+            });
+            return { error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error deleting checklist" };
+        }
     },
 
     async toggleChecklistItem(cardId, checklistId, checkItemId, currentState) {
-        await axios.put(
-            `${BASE_URL}1/cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
-            { state: currentState === "complete" ? "incomplete" : "complete" },
-            { params: { key, token } }
-        );
+        try {
+            await axios.put(
+                `${BASE_URL}1/cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
+                {
+                    state:
+                        currentState === "complete" ? "incomplete" : "complete",
+                },
+                { params: { key, token } }
+            );
+            return { error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Something went wrong" };
+        }
     },
 
     async deleteChecklistItem(checklistId, checkItemId) {
-        await axios.delete(
-            `${BASE_URL}1/checklists/${checklistId}/checkItems/${checkItemId}`,
-            { params: { key, token } }
-        );
+        try {
+            await axios.delete(
+                `${BASE_URL}1/checklists/${checklistId}/checkItems/${checkItemId}`,
+                { params: { key, token } }
+            );
+            return { error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error deleting checklist item" };
+        }
     },
 
     async createChecklistItem(checklistId, name) {
-        const response = await axios.post(
-            `${BASE_URL}1/checklists/${checklistId}/checkItems`,
-            { name },
-            { params: { key, token } }
-        );
-        return response.data;
+        try {
+            const { data } = await axios.post(
+                `${BASE_URL}1/checklists/${checklistId}/checkItems`,
+                { name },
+                { params: { key, token } }
+            );
+            return { data, error: null };
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Error creating checkItem" };
+        }
     },
 };

@@ -1,11 +1,23 @@
-import { Card, Box, Typography, Button, List, LinearProgress, Input } from "@mui/material";
+import {
+    Card,
+    Box,
+    Typography,
+    Button,
+    List,
+    LinearProgress,
+    Input,
+} from "@mui/material";
 import { ChecklistItem } from "./ChecklistItem";
 import { checklistAPIs } from "../utils/apiCalls";
 import { useState } from "react";
 
 export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
     const [newItemName, setNewItemName] = useState("");
-    const [isLoading,setIsLoading]=useState(false);
+    const [isLoading, setIsLoading] = useState({
+        add: false,
+        delete: false,
+        itemDelete: false,
+    });
 
     const calculateProgress = (items) => {
         if (!items?.length) return 0;
@@ -15,11 +27,13 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
 
     const handleDeleteChecklist = async () => {
         try {
+            setIsLoading((prev) => ({ ...prev, delete: true }));
             await checklistAPIs.deleteChecklist(checklist.id);
             dispatch({ type: "REMOVE_CHECKLIST", payload: checklist.id });
         } catch (err) {
             console.error("Failed to delete checklist", err);
         }
+        setIsLoading((prev) => ({ ...prev, delete: false }));
     };
 
     const handleToggleItem = async (itemId, currentState) => {
@@ -41,6 +55,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
 
     const handleDeleteItem = async (itemId) => {
         try {
+            setIsLoading((prev) => ({ ...prev, itemDelete: true }));
             await checklistAPIs.deleteChecklistItem(checklist.id, itemId);
             dispatch({
                 type: "DELETE_ITEM",
@@ -49,12 +64,15 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
         } catch (err) {
             console.error("Failed to delete item", err);
         }
+
+        setIsLoading((prev) => ({ ...prev, itemDelete: false }));
     };
 
     const handleCreateItem = async () => {
         if (!newItemName.trim()) return;
         try {
-            const data = await checklistAPIs.createChecklistItem(
+            setIsLoading((prev) => ({ ...prev, add: true }));
+            const {data} = await checklistAPIs.createChecklistItem(
                 checklist.id,
                 newItemName
             );
@@ -66,6 +84,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
         } catch (err) {
             console.error("Failed to create item", err);
         }
+        setIsLoading((prev) => ({ ...prev, add: false }));
     };
 
     return (
@@ -76,27 +95,39 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                     value={calculateProgress(checklist.checkItems)}
                 />
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 1,
+                }}
+            >
                 <Typography variant="subtitle1">{checklist.name}</Typography>
                 <Button
                     size="small"
                     color="error"
                     onClick={handleDeleteChecklist}
-
+                    loading={isLoading.delete}
                 >
                     Delete
                 </Button>
             </Box>
             <List dense>
                 {checklist.checkItems?.length === 0 ? (
-                    <Typography variant="body2" sx={{ px: 2, py: 1 }}>No items in this checklist</Typography>
+                    <Typography variant="body2" sx={{ px: 2, py: 1 }}>
+                        No items in this checklist
+                    </Typography>
                 ) : (
                     checklist.checkItems?.map((item) => (
                         <ChecklistItem
                             key={item.id}
                             item={item}
-                            onToggle={() => handleToggleItem(item.id, item.state)}
+                            onToggle={() =>
+                                handleToggleItem(item.id, item.state)
+                            }
                             onDelete={() => handleDeleteItem(item.id)}
+                            isLoading={isLoading}
                         />
                     ))
                 )}
@@ -113,6 +144,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                     variant="outlined"
                     onClick={handleCreateItem}
                     disabled={!newItemName.trim()}
+                    loading={isLoading.add}
                 >
                     Add
                 </Button>

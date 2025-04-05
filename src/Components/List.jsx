@@ -26,30 +26,52 @@ export default function ListComponent({ listName, id }) {
     const [cards, dispatch] = useReducer(cardsReducer, []);
     const [show, setShow] = useState(false);
     const [cardInput, setCardInput] = useState("");
-
+    const [isLoading, setIsLoading] = useState({ delete: false, add: false });
     useEffect(() => {
         async function fetchData() {
-            const { data } = await cardAPIs.getAllCards(id);
-            dispatch({ type: "SET_CARDS", payload: data });
+            try {
+                const { data } = await cardAPIs.getAllCards(id);
+                dispatch({ type: "SET_CARDS", payload: data });
+            } catch (error) {
+                alert("Something went wrong !");
+            }
         }
         fetchData();
     }, []);
 
     const deleteCard = async (id) => {
-        await cardAPIs.deleteCard(id);
-        dispatch({ type: "REMOVE_CARD", payload: id });
+        try {
+            setIsLoading((prev) => ({ ...prev, delete: true }));
+            await cardAPIs.deleteCard(id);
+            dispatch({ type: "REMOVE_CARD", payload: id });
+        } catch (error) {
+            alert("Something went wrong!");
+        } finally {
+            setIsLoading((prev) => ({ ...prev, delete: false }));
+        }
     };
 
     const addCard = async (name) => {
-        const { data } = await cardAPIs.addCard(id, name);
-        dispatch({ type: "ADD_CARD", payload: data });
-        setCardInput("");
-        setShow(false);
+        try {
+            setIsLoading((prev) => ({ ...prev, add: true }));
+            const { data } = await cardAPIs.addCard(id, name);
+            dispatch({ type: "ADD_CARD", payload: data });
+        } catch (err) {
+            alert("Error occurred");
+        } finally {
+            setCardInput("");
+            setShow(false);
+            setIsLoading((prev) => ({ ...prev, add: false }));
+        }
     };
 
     const toggleComplete = async (cardId, dueComplete) => {
-        const data = await cardAPIs.toggleComplete(cardId, dueComplete);
-        dispatch({ type: "CHECK_CARD", payload: cardId });
+        try {
+            await cardAPIs.toggleComplete(cardId, dueComplete);
+            dispatch({ type: "CHECK_CARD", payload: cardId });
+        } catch (error) {
+            alert("Error occurred");
+        }
     };
 
     return (
@@ -119,9 +141,9 @@ export default function ListComponent({ listName, id }) {
                                         },
                                     }}
                                 />
-                                
-                                <ChecklistModal cardId={id} name={name}/>
-                                   
+
+                                <ChecklistModal cardId={id} name={name} />
+
                                 <Box
                                     className="card-actions"
                                     sx={{
@@ -131,6 +153,7 @@ export default function ListComponent({ listName, id }) {
                                     }}
                                 >
                                     <IconButton
+                                        loading={isLoading.delete}
                                         size="small"
                                         onClick={() => deleteCard(id)}
                                         sx={{ color: "grey.600" }}
@@ -158,11 +181,12 @@ export default function ListComponent({ listName, id }) {
                     />
                     <Box sx={{ display: "flex", gap: 1 }}>
                         <Button
+                            loading={isLoading.add}
                             variant="contained"
                             onClick={() => addCard(cardInput)}
                             disabled={!cardInput.trim()}
                         >
-                            Add Card
+                            Save
                         </Button>
                         <IconButton onClick={() => setShow(false)}>
                             <CloseIcon />
@@ -171,6 +195,7 @@ export default function ListComponent({ listName, id }) {
                 </Box>
             ) : (
                 <Button
+                    loading={isLoading.add}
                     startIcon={<AddIcon />}
                     onClick={() => setShow(true)}
                     sx={{
