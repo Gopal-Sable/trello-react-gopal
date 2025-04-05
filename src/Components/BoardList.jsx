@@ -3,7 +3,7 @@ import { useEffect, useReducer, useState } from "react";
 import AddNewBoardModal from "./AddNewModal";
 import AddIcon from "@mui/icons-material/Add";
 import { boardAPIs } from "../utils/apiCalls";
-import boardsReducer from "../Reducers/boards";
+import boardsReducer from "../Reducers/reducer";
 import BoardCard from "./BoardCard";
 
 const BoardList = () => {
@@ -15,14 +15,14 @@ const BoardList = () => {
         if (error) {
             return alert("Error creating board", error);
         }
-        dispatch({ type: "ADD_BOARD", payload: data });
+        dispatch({ type: "ADD_DATA", payload: data });
     };
 
     useEffect(() => {
         (async () => {
             try {
                 const { data } = await boardAPIs.getAllBoards();
-                dispatch({ type: "SET_BOARDS", payload: data });
+                dispatch({ type: "SET_DATA", payload: data });
             } catch (error) {
                 console.error("Fetch error:", error);
             } finally {

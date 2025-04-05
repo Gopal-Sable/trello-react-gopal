@@ -29,7 +29,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
         try {
             setIsLoading((prev) => ({ ...prev, delete: true }));
             await checklistAPIs.deleteChecklist(checklist.id);
-            dispatch({ type: "REMOVE_CHECKLIST", payload: checklist.id });
+            dispatch({ type: "REMOVE_DATA", payload: checklist.id });
         } catch (err) {
             console.error("Failed to delete checklist", err);
         }

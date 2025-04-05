@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { ChecklistCard } from "./ChecklistCard";
 import { checklistAPIs } from "../utils/apiCalls";
-import checklistReducer from "../Reducers/checklist";
+import checklistReducer from "../Reducers/reducer";
 
 const modalStyle = {
     position: "absolute",
@@ -42,7 +42,7 @@ const ChecklistModal = ({ cardId, name }) => {
                 try {
                     setIsLoading((prev) => ({ ...prev, data: true }));
                     const {data} = await checklistAPIs.getChecklists(cardId);
-                    dispatch({ type: "SET_CHECKLISTS", payload: data });
+                    dispatch({ type: "SET_DATA", payload: data });
                 } catch (err) {
                     setError("Failed to load checklists");
                     console.error(err);
@@ -65,7 +65,7 @@ const ChecklistModal = ({ cardId, name }) => {
                 cardId,
                 newChecklistName
             );
-            dispatch({ type: "ADD_CHECKLIST", payload: data });
+            dispatch({ type: "ADD_DATA", payload: data });
         } catch (err) {
             setError("Failed to create checklist");
             console.error(err);

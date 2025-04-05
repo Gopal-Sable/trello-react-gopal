@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ChecklistModal from "./ChecklistModal";
-import cardsReducer from "../Reducers/cards";
+import cardsReducer from "../Reducers/reducer";
 import { cardAPIs } from "../utils/apiCalls";
 
 export default function ListComponent({ listName, id }) {
@@ -31,7 +31,7 @@ export default function ListComponent({ listName, id }) {
         async function fetchData() {
             try {
                 const { data } = await cardAPIs.getAllCards(id);
-                dispatch({ type: "SET_CARDS", payload: data });
+                dispatch({ type: "SET_DATA", payload: data });
             } catch (error) {
                 alert("Something went wrong !");
             }
@@ -43,7 +43,7 @@ export default function ListComponent({ listName, id }) {
         try {
             setIsLoading((prev) => ({ ...prev, delete: true }));
             await cardAPIs.deleteCard(id);
-            dispatch({ type: "REMOVE_CARD", payload: id });
+            dispatch({ type: "REMOVE_DATA", payload: id });
         } catch (error) {
             alert("Something went wrong!");
         } finally {
@@ -55,7 +55,7 @@ export default function ListComponent({ listName, id }) {
         try {
             setIsLoading((prev) => ({ ...prev, add: true }));
             const { data } = await cardAPIs.addCard(id, name);
-            dispatch({ type: "ADD_CARD", payload: data });
+            dispatch({ type: "ADD_DATA", payload: data });
         } catch (err) {
             alert("Error occurred");
         } finally {

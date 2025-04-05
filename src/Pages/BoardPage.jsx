@@ -5,7 +5,7 @@ import { useParams } from "react-router";
 import AddNewModal from "../Components/AddNewModal";
 import AddIcon from "@mui/icons-material/Add";
 import ArchiveIcon from "@mui/icons-material/Archive";
-import listsReducer from "../Reducers/lists";
+import listsReducer from "../Reducers/reducer";
 import { listAPIs } from "../utils/apiCalls";
 
 const BoardPage = () => {
@@ -21,7 +21,7 @@ const BoardPage = () => {
             if (error) {
                 setError(error);
             } else {
-                dispatch({ type: "SET_LISTS", payload: data });
+                dispatch({ type: "SET_DATA", payload: data });
             }
             setLoading(false);
         };
@@ -34,7 +34,7 @@ const BoardPage = () => {
         if (error) {
             setError(error);
         } else {
-            dispatch({ type: "ADD_LIST", payload: data });
+            dispatch({ type: "ADD_DATA", payload: data });
         }
     };
 
@@ -43,7 +43,7 @@ const BoardPage = () => {
         if (error) {
             setError(error);
         } else {
-            dispatch({ type: "REMOVE_LIST", payload: listId });
+            dispatch({ type: "REMOVE_DATA", payload: listId });
         }
     };
 
