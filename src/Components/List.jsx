@@ -1,26 +1,17 @@
 import {
-    List,
     ListSubheader,
     TextField,
     Button,
     Card,
-    CardContent,
     IconButton,
     Box,
-    Checkbox,
-    Stack,
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ChecklistModal from "./ChecklistModal";
 import cardsReducer from "../Reducers/reducer";
 import { cardAPIs } from "../utils/apiCalls";
+import CardComponent from "./CardComponent";
 
 export default function ListComponent({ listName, id }) {
     const [cards, dispatch] = useReducer(cardsReducer, []);
@@ -39,18 +30,6 @@ export default function ListComponent({ listName, id }) {
         fetchData();
     }, []);
 
-    const deleteCard = async (id) => {
-        try {
-            setIsLoading((prev) => ({ ...prev, delete: true }));
-            await cardAPIs.deleteCard(id);
-            dispatch({ type: "REMOVE_DATA", payload: id });
-        } catch (error) {
-            alert("Something went wrong!");
-        } finally {
-            setIsLoading((prev) => ({ ...prev, delete: false }));
-        }
-    };
-
     const addCard = async (name) => {
         try {
             setIsLoading((prev) => ({ ...prev, add: true }));
@@ -62,15 +41,6 @@ export default function ListComponent({ listName, id }) {
             setCardInput("");
             setShow(false);
             setIsLoading((prev) => ({ ...prev, add: false }));
-        }
-    };
-
-    const toggleComplete = async (cardId, dueComplete) => {
-        try {
-            await cardAPIs.toggleComplete(cardId, dueComplete);
-            dispatch({ type: "CHECK_CARD", payload: cardId });
-        } catch (error) {
-            alert("Error occurred");
         }
     };
 
@@ -99,71 +69,13 @@ export default function ListComponent({ listName, id }) {
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {cards.map(({ id, name, dueComplete }) => (
-                    <Card
+                    <CardComponent
                         key={id}
-                        sx={{
-                            bgcolor: "white",
-                            boxShadow: "0 1px 0 rgba(9,30,66,.25)",
-                            borderRadius: 1,
-                            p: 1,
-                            "&:hover": {
-                                bgcolor: "#f4f5f7",
-                                "& .card-actions": {
-                                    visibility: "visible",
-                                },
-                            },
-                            ...(dueComplete && {
-                                bgcolor: "#f8f9fa",
-                                color: "text.secondary",
-                                textDecoration: "line-through",
-                            }),
-                        }}
-                    >
-                        <CardContent sx={{ p: "8px !important" }}>
-                            <Stack
-                                direction="row"
-                                alignItems="flex-start"
-                                spacing={1}
-                            >
-                                <Checkbox
-                                    icon={<RadioButtonUncheckedIcon />}
-                                    checkedIcon={
-                                        <CheckCircleOutlineIcon color="primary" />
-                                    }
-                                    checked={dueComplete}
-                                    onChange={() =>
-                                        toggleComplete(id, !dueComplete)
-                                    }
-                                    sx={{
-                                        p: 0,
-                                        "&:hover": {
-                                            bgcolor: "transparent",
-                                        },
-                                    }}
-                                />
-
-                                <ChecklistModal cardId={id} name={name} />
-
-                                <Box
-                                    className="card-actions"
-                                    sx={{
-                                        visibility: "hidden",
-                                        display: "flex",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <IconButton
-                                        loading={isLoading.delete}
-                                        size="small"
-                                        onClick={() => deleteCard(id)}
-                                        sx={{ color: "grey.600" }}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                </Box>
-                            </Stack>
-                        </CardContent>
-                    </Card>
+                        id={id}
+                        name={name}
+                        dueComplete={dueComplete}
+                        dispatch={dispatch}
+                    />
                 ))}
             </Box>
 

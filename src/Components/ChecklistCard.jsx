@@ -36,43 +36,11 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
         setIsLoading((prev) => ({ ...prev, delete: false }));
     };
 
-    const handleToggleItem = async (itemId, currentState) => {
-        try {
-            await checklistAPIs.toggleChecklistItem(
-                cardId,
-                checklist.id,
-                itemId,
-                currentState
-            );
-            dispatch({
-                type: "TOGGLE_CHECKITEM",
-                payload: { checklistId: checklist.id, checkItemId: itemId },
-            });
-        } catch (err) {
-            console.error("Failed to update item", err);
-        }
-    };
-
-    const handleDeleteItem = async (itemId) => {
-        try {
-            setIsLoading((prev) => ({ ...prev, itemDelete: true }));
-            await checklistAPIs.deleteChecklistItem(checklist.id, itemId);
-            dispatch({
-                type: "DELETE_ITEM",
-                payload: { id: checklist.id, checkedId: itemId },
-            });
-        } catch (err) {
-            console.error("Failed to delete item", err);
-        }
-
-        setIsLoading((prev) => ({ ...prev, itemDelete: false }));
-    };
-
     const handleCreateItem = async () => {
         if (!newItemName.trim()) return;
         try {
             setIsLoading((prev) => ({ ...prev, add: true }));
-            const {data} = await checklistAPIs.createChecklistItem(
+            const { data } = await checklistAPIs.createChecklistItem(
                 checklist.id,
                 newItemName
             );
@@ -123,11 +91,9 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                         <ChecklistItem
                             key={item.id}
                             item={item}
-                            onToggle={() =>
-                                handleToggleItem(item.id, item.state)
-                            }
-                            onDelete={() => handleDeleteItem(item.id)}
-                            isLoading={isLoading}
+                            dispatch={dispatch}
+                            checklistId={checklist.id}
+                            cardId={cardId}
                         />
                     ))
                 )}

@@ -1,4 +1,3 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,8 +10,8 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
-import { useNavigate,Link } from "react-router";
+import logo from "../assets/logo.png";
+import { useNavigate, Link } from "react-router";
 
 const pages = ["Home"];
 
@@ -20,10 +19,10 @@ function Navbar() {
     const navigate = useNavigate();
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={{ bgcolor: "gray" }}>
             <Container>
                 <Toolbar>
-                    <AdbIcon sx={{ display: { xs: "none", md: "flex" } }} />
+                    <img onClick={()=>navigate("/")} src={logo} width="100px" loading="lazy" />
                     <Typography
                         variant="h6"
                         noWrap
@@ -38,9 +37,7 @@ function Navbar() {
                             color: "inherit",
                             textDecoration: "none",
                         }}
-                    >
-                        LOGO
-                    </Typography>
+                    ></Typography>
 
                     <Box
                         sx={{
@@ -85,15 +82,11 @@ function Navbar() {
                             ))}
                         </Menu>
                     </Box>
-                    <AdbIcon
-                        sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}
-                    />
                     <Typography
                         variant="h5"
                         noWrap
                         component={Link}
                         to="/"
-                      
                         sx={{
                             mr: 2,
                             display: { xs: "flex", md: "none" },
@@ -104,9 +97,7 @@ function Navbar() {
                             color: "inherit",
                             textDecoration: "none",
                         }}
-                    >
-                        LOGO
-                    </Typography>
+                    ></Typography>
                     <Box
                         sx={{
                             flexGrow: 1,
@@ -128,13 +119,8 @@ function Navbar() {
                     </Box>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
-                            <IconButton
-                                sx={{ p: 0 }}
-                            >
-                                <Avatar
-                                    alt="avatar"
-                                    src=""
-                                />
+                            <IconButton sx={{ p: 0 }}>
+                                <Avatar alt="avatar" src="" />
                             </IconButton>
                         </Tooltip>
                     </Box>
