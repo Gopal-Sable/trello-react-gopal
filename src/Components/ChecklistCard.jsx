@@ -62,6 +62,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                     variant="determinate"
                     value={calculateProgress(checklist.checkItems)}
                 />
+                {calculateProgress(checklist.checkItems)} %
             </Box>
             <Box
                 sx={{

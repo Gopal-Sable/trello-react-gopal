@@ -8,7 +8,7 @@ export const listAPIs = {
     async getLists(boardId) {
         try {
             const { data } = await axios.get(
-                `${BASE_URL}1/boards/${boardId}/lists`,
+                `${BASE_URL}boards/${boardId}/lists`,
                 {
                     params: { key, token },
                 }
@@ -23,7 +23,7 @@ export const listAPIs = {
     async createList(boardId, name) {
         try {
             const { data } = await axios.post(
-                `${BASE_URL}1/boards/${boardId}/lists`,
+                `${BASE_URL}boards/${boardId}/lists`,
                 null,
                 {
                     params: { name, key, token },
@@ -38,7 +38,7 @@ export const listAPIs = {
 
     async archiveList(listId) {
         try {
-            await axios.put(`${BASE_URL}1/lists/${listId}`, null, {
+            await axios.put(`${BASE_URL}lists/${listId}`, null, {
                 params: { key, token, closed: true },
             });
             return { error: null };
@@ -52,7 +52,7 @@ export const listAPIs = {
 export const boardAPIs = {
     async createBoard(name) {
         try {
-            const { data } = await axios.post(`${BASE_URL}1/boards`, null, {
+            const { data } = await axios.post(`${BASE_URL}boards`, null, {
                 params: {
                     name,
                     key,
@@ -67,7 +67,7 @@ export const boardAPIs = {
     },
     async getAllBoards() {
         try {
-            const { data } = await axios.get(`${BASE_URL}1/members/me/boards`, {
+            const { data } = await axios.get(`${BASE_URL}members/me/boards`, {
                 params: {
                     key,
                     token,
@@ -84,7 +84,7 @@ export const boardAPIs = {
 export const cardAPIs = {
     async getAllCards(id) {
         try {
-            const { data } = await axios.get(`${BASE_URL}1/list/${id}/cards`, {
+            const { data } = await axios.get(`${BASE_URL}list/${id}/cards`, {
                 params: {
                     key,
                     token,
@@ -98,7 +98,7 @@ export const cardAPIs = {
     },
     async deleteCard(id) {
         try {
-            const { data } = await axios.delete(`${BASE_URL}1/cards/${id}`, {
+            const { data } = await axios.delete(`${BASE_URL}cards/${id}`, {
                 params: {
                     key,
                     token,
@@ -112,7 +112,7 @@ export const cardAPIs = {
     },
     async addCard(id, name) {
         try {
-            const { data } = await axios.post(`${BASE_URL}1/cards/`, null, {
+            const { data } = await axios.post(`${BASE_URL}cards/`, null, {
                 params: {
                     idList: id,
                     name,
@@ -129,7 +129,7 @@ export const cardAPIs = {
     async toggleComplete(cardId, dueComplete) {
         try {
             const { data } = await axios.put(
-                `${BASE_URL}1/cards/${cardId}`,
+                `${BASE_URL}cards/${cardId}`,
                 null,
                 {
                     params: {
@@ -150,7 +150,7 @@ export const checklistAPIs = {
     async getChecklists(id) {
         try {
             const { data } = await axios.get(
-                `${BASE_URL}1/cards/${id}/checklists`,
+                `${BASE_URL}cards/${id}/checklists`,
                 {
                     params: { key, token },
                 }
@@ -165,7 +165,7 @@ export const checklistAPIs = {
     async createChecklist(cardId, name) {
         try {
             const { data } = await axios.post(
-                `${BASE_URL}1/cards/${cardId}/checklists`,
+                `${BASE_URL}cards/${cardId}/checklists`,
                 { name },
                 { params: { key, token } }
             );
@@ -178,7 +178,7 @@ export const checklistAPIs = {
 
     async deleteChecklist(checklistId) {
         try {
-            await axios.delete(`${BASE_URL}1/checklists/${checklistId}`, {
+            await axios.delete(`${BASE_URL}checklists/${checklistId}`, {
                 params: { key, token },
             });
             return { error: null };
@@ -191,7 +191,7 @@ export const checklistAPIs = {
     async toggleChecklistItem(cardId, checklistId, checkItemId, currentState) {
         try {
             await axios.put(
-                `${BASE_URL}1/cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
+                `${BASE_URL}cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
                 {
                     state:
                         currentState === "complete" ? "incomplete" : "complete",
@@ -208,7 +208,7 @@ export const checklistAPIs = {
     async deleteChecklistItem(checklistId, checkItemId) {
         try {
             await axios.delete(
-                `${BASE_URL}1/checklists/${checklistId}/checkItems/${checkItemId}`,
+                `${BASE_URL}checklists/${checklistId}/checkItems/${checkItemId}`,
                 { params: { key, token } }
             );
             return { error: null };
@@ -221,7 +221,7 @@ export const checklistAPIs = {
     async createChecklistItem(checklistId, name) {
         try {
             const { data } = await axios.post(
-                `${BASE_URL}1/checklists/${checklistId}/checkItems`,
+                `${BASE_URL}checklists/${checklistId}/checkItems`,
                 { name },
                 { params: { key, token } }
             );
