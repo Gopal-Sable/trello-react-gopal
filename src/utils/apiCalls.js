@@ -1,234 +1,52 @@
 import axios from "axios";
-import { BASE_URL } from "./constants";
 
+const BASE_URL = "https://api.trello.com/1/";
 const key = import.meta.env.VITE_API_KEY;
 const token = import.meta.env.VITE_TOKEN;
 
-export const listAPIs = {
-    async getLists(boardId) {
-        try {
-            const { data } = await axios.get(
-                `${BASE_URL}boards/${boardId}/lists`,
-                {
-                    params: { key, token },
-                }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error fetching lists:", error);
-            return { data: null, error: "Failed to load lists" };
-        }
-    },
-
-    async createList(boardId, name) {
-        try {
-            const { data } = await axios.post(
-                `${BASE_URL}boards/${boardId}/lists`,
-                null,
-                {
-                    params: { name, key, token },
-                }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error adding list:", error);
-            return { data: null, error: "Failed to create list" };
-        }
-    },
-
-    async archiveList(listId) {
-        try {
-            await axios.put(`${BASE_URL}lists/${listId}`, null, {
-                params: { key, token, closed: true },
-            });
-            return { error: null };
-        } catch (error) {
-            console.error("Error archiving list:", error);
-            return { error: "Failed to archive list" };
-        }
-    },
+// Generic API handler
+const apiHandler = async (method, endpoint, data = null, params = {}) => {
+  try {
+    const response = await axios({
+      method,
+      url: `${BASE_URL}${endpoint}`,
+      data,
+      params: { ...params, key, token },
+    });
+    return { data: response.data, error: null };
+  } catch (error) {
+    console.error(`API Error (${endpoint}):`, error);
+    return { data: null, error: error.message };
+  }
 };
 
+// Board APIs
 export const boardAPIs = {
-    async createBoard(name) {
-        try {
-            const { data } = await axios.post(`${BASE_URL}boards`, null, {
-                params: {
-                    name,
-                    key,
-                    token,
-                },
-            });
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error creating board" };
-        }
-    },
-    async getAllBoards() {
-        try {
-            const { data } = await axios.get(`${BASE_URL}members/me/boards`, {
-                params: {
-                    key,
-                    token,
-                },
-            });
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error creating board" };
-        }
-    },
+  createBoard: (name) => apiHandler("post", "boards", null, { name }),
+  getAllBoards: () => apiHandler("get", "members/me/boards"),
 };
 
+// List APIs
+export const listAPIs = {
+  getLists: (boardId) => apiHandler("get", `boards/${boardId}/lists`),
+  createList: (boardId, name) => apiHandler("post", `boards/${boardId}/lists`, null, { name }),
+  archiveList: (listId) => apiHandler("put", `lists/${listId}`, null, { closed: true }),
+};
+
+// Card APIs
 export const cardAPIs = {
-    async getAllCards(id) {
-        try {
-            const { data } = await axios.get(`${BASE_URL}list/${id}/cards`, {
-                params: {
-                    key,
-                    token,
-                },
-            });
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error fetching cards" };
-        }
-    },
-    async deleteCard(id) {
-        try {
-            const { data } = await axios.delete(`${BASE_URL}cards/${id}`, {
-                params: {
-                    key,
-                    token,
-                },
-            });
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error deleting card" };
-        }
-    },
-    async addCard(id, name) {
-        try {
-            const { data } = await axios.post(`${BASE_URL}cards/`, null, {
-                params: {
-                    idList: id,
-                    name,
-                    key,
-                    token,
-                },
-            });
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error deleting card" };
-        }
-    },
-    async toggleComplete(cardId, dueComplete) {
-        try {
-            const { data } = await axios.put(
-                `${BASE_URL}cards/${cardId}`,
-                null,
-                {
-                    params: {
-                        dueComplete,
-                        key,
-                        token,
-                    },
-                }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error deleting card" };
-        }
-    },
+  getAllCards: (listId) => apiHandler("get", `lists/${listId}/cards`),
+  addCard: (listId, name) => apiHandler("post", "cards", null, { idList: listId, name }),
+  deleteCard: (cardId) => apiHandler("delete", `cards/${cardId}`),
+  toggleComplete: (cardId, dueComplete) => apiHandler("put", `cards/${cardId}`, null, { dueComplete }),
 };
+
+// Checklist APIs
 export const checklistAPIs = {
-    async getChecklists(id) {
-        try {
-            const { data } = await axios.get(
-                `${BASE_URL}cards/${id}/checklists`,
-                {
-                    params: { key, token },
-                }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error fetching checklist" };
-        }
-    },
-
-    async createChecklist(cardId, name) {
-        try {
-            const { data } = await axios.post(
-                `${BASE_URL}cards/${cardId}/checklists`,
-                { name },
-                { params: { key, token } }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error creating checklist" };
-        }
-    },
-
-    async deleteChecklist(checklistId) {
-        try {
-            await axios.delete(`${BASE_URL}checklists/${checklistId}`, {
-                params: { key, token },
-            });
-            return { error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error deleting checklist" };
-        }
-    },
-
-    async toggleChecklistItem(cardId, checklistId, checkItemId, currentState) {
-        try {
-            await axios.put(
-                `${BASE_URL}cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`,
-                {
-                    state:
-                        currentState === "complete" ? "incomplete" : "complete",
-                },
-                { params: { key, token } }
-            );
-            return { error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Something went wrong" };
-        }
-    },
-
-    async deleteChecklistItem(checklistId, checkItemId) {
-        try {
-            await axios.delete(
-                `${BASE_URL}checklists/${checklistId}/checkItems/${checkItemId}`,
-                { params: { key, token } }
-            );
-            return { error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error deleting checklist item" };
-        }
-    },
-
-    async createChecklistItem(checklistId, name) {
-        try {
-            const { data } = await axios.post(
-                `${BASE_URL}checklists/${checklistId}/checkItems`,
-                { name },
-                { params: { key, token } }
-            );
-            return { data, error: null };
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Error creating checkItem" };
-        }
-    },
+  getChecklists: (cardId) => apiHandler("get", `cards/${cardId}/checklists`),
+  createChecklist: (cardId, name) => apiHandler("post", `cards/${cardId}/checklists`, { name }),
+  deleteChecklist: (checklistId) => apiHandler("delete", `checklists/${checklistId}`),
+  createChecklistItem: (checklistId, name) => apiHandler("post", `checklists/${checklistId}/checkItems`, { name }),
+  deleteChecklistItem: (checklistId, checkItemId) => apiHandler("delete", `checklists/${checklistId}/checkItems/${checkItemId}`),
+  toggleChecklistItem: (cardId, checklistId, checkItemId, state) => apiHandler("put", `cards/${cardId}/checklist/${checklistId}/checkItem/${checkItemId}`, { state }),
 };
