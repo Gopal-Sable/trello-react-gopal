@@ -1,8 +1,18 @@
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AddNewModal from "../AddNewModal";
+import { listAPIs } from "../../utils/apiCalls";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router";
+import { addList } from "../../features/listSlice";
 
-const CreateListButton = ({ handleCreateList }) => {
+const CreateListButton = () => {
+    const dispatch = useDispatch();
+    const { id } = useParams();
+    const handleCreateList = async (name) => {
+        const { data, error } = await listAPIs.createList(id, name);
+        if (!error) dispatch(addList(data));
+    };
     return (
         <AddNewModal name="Add List" handleSubmit={handleCreateList}>
             <Button

@@ -5,24 +5,43 @@ import {
     Checkbox,
     IconButton,
     Stack,
+    CircularProgress,
 } from "@mui/material";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import React, { useState } from "react";
-import ChecklistModal from "./ChecklistModal";
-import { cardAPIs } from "../utils/apiCalls";
+
+import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { cardAPIs } from "../utils/apiCalls";
 import { removeCard, toggleCard } from "../features/cardSlice";
+import ChecklistModal from "./ChecklistModal";
+
+//  Styles
+const cardStyle = (dueComplete) => ({
+    bgcolor: dueComplete ? "#f8f9fa" : "white",
+    boxShadow: "0 1px 0 rgba(9,30,66,.25)",
+    borderRadius: 1,
+    p: 1,
+    color: dueComplete ? "text.secondary" : "inherit",
+    textDecoration: dueComplete ? "line-through" : "none",
+    "&:hover": {
+        bgcolor: "#f4f5f7",
+        "& .card-actions": {
+            visibility: "visible",
+        },
+    },
+});
 
 const CardComponent = ({ id, name, dueComplete, listId }) => {
     const dispatch = useDispatch();
-    const deleteCard = async (cardId) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleDelete = async () => {
         try {
             setIsLoading(true);
             await cardAPIs.deleteCard(id);
-            dispatch(removeCard({ id: listId, cardId }));
+            dispatch(removeCard({ id: listId, cardId: id }));
         } catch (error) {
             alert("Something went wrong!");
         } finally {
@@ -30,48 +49,27 @@ const CardComponent = ({ id, name, dueComplete, listId }) => {
         }
     };
 
-    const toggleComplete = async (cardId, dueComplete) => {
+    const handleToggle = async () => {
         try {
-            await cardAPIs.toggleComplete(cardId, dueComplete);
-            dispatch(toggleCard({ id: listId, data: cardId }));
+            await cardAPIs.toggleComplete(id, !dueComplete);
+            dispatch(toggleCard({ id: listId, data: id }));
         } catch (error) {
             alert("Error occurred");
         }
     };
-    const [isLoading, setIsLoading] = useState(false);
+
     return (
-        <Card
-            key={id}
-            sx={{
-                bgcolor: "white",
-                boxShadow: "0 1px 0 rgba(9,30,66,.25)",
-                borderRadius: 1,
-                p: 1,
-                "&:hover": {
-                    bgcolor: "#f4f5f7",
-                    "& .card-actions": {
-                        visibility: "visible",
-                    },
-                },
-                ...(dueComplete && {
-                    bgcolor: "#f8f9fa",
-                    color: "text.secondary",
-                    textDecoration: "line-through",
-                }),
-            }}
-        >
+        <Card sx={cardStyle(dueComplete)}>
             <CardContent sx={{ p: "8px !important" }}>
                 <Stack direction="row" alignItems="flex-start" spacing={1}>
                     <Checkbox
                         icon={<RadioButtonUncheckedIcon />}
                         checkedIcon={<CheckCircleOutlineIcon color="primary" />}
                         checked={dueComplete}
-                        onChange={() => toggleComplete(id, !dueComplete)}
+                        onChange={handleToggle}
                         sx={{
                             p: 0,
-                            "&:hover": {
-                                bgcolor: "transparent",
-                            },
+                            "&:hover": { bgcolor: "transparent" },
                         }}
                     />
 
@@ -85,16 +83,16 @@ const CardComponent = ({ id, name, dueComplete, listId }) => {
                             alignItems: "center",
                         }}
                     >
-                        {/* delete the card */}
                         <IconButton
-                            loading={isLoading}
                             size="small"
-                            onClick={() => {
-                                deleteCard(id);
-                            }}
+                            onClick={handleDelete}
                             sx={{ color: "grey.600" }}
                         >
-                            <DeleteIcon fontSize="small" />
+                            {isLoading ? (
+                                <CircularProgress size={16} />
+                            ) : (
+                                <DeleteIcon fontSize="small" />
+                            )}
                         </IconButton>
                     </Box>
                 </Stack>

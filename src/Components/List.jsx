@@ -28,7 +28,7 @@ const ListComponent = ({ listName, id }) => {
             if (!error) dispatch(setCards({ id, data }));
         };
         fetchCards();
-    }, [id, dispatch]);
+    }, [id]);
 
     return (
         <Card sx={{ width: 272, bgcolor: "#ebecf0", p: 1 }}>

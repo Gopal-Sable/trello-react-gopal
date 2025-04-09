@@ -35,17 +35,16 @@ const ChecklistModal = ({ cardId, name }) => {
         data: false,
         creteList: false,
     });
-    const [cardID, setCardID] = useState(cardId);
     const [error, setError] = useState(null);
     const [newChecklistName, setNewChecklistName] = useState("");
 
     useEffect(() => {
-        // if (open && cardId) {
         const fetchData = async () => {
             try {
+                if (checkListData[cardId]) return;
                 setIsLoading((prev) => ({ ...prev, data: true }));
-                const { data } = await checklistAPIs.getChecklists(cardID);
-                dispatch(setChecklists({ id: cardID, data }));
+                const { data } = await checklistAPIs.getChecklists(cardId);
+                dispatch(setChecklists({ id: cardId, data }));
             } catch (err) {
                 setError("Failed to load checklists");
                 console.error(err);
@@ -53,9 +52,8 @@ const ChecklistModal = ({ cardId, name }) => {
                 setIsLoading((prev) => ({ ...prev, data: false }));
             }
         };
-        fetchData();
-        // }
-    }, []);
+        if (open) fetchData();
+    }, [open]);
 
     const handleCreateChecklist = async () => {
         if (!newChecklistName.trim()) {
@@ -65,10 +63,10 @@ const ChecklistModal = ({ cardId, name }) => {
         try {
             setIsLoading((prev) => ({ ...prev, creteList: true }));
             const { data } = await checklistAPIs.createChecklist(
-                cardID,
+                cardId,
                 newChecklistName
             );
-            dispatch(addChecklist({ id: cardID, data }));
+            dispatch(addChecklist({ id: cardId, data }));
         } catch (err) {
             setError("Failed to create checklist");
             console.error(err);
@@ -119,18 +117,18 @@ const ChecklistModal = ({ cardId, name }) => {
 
                     {/* display all checklists  */}
                     <List sx={{ width: "100%" }}>
-                        {checkListData[cardID]?.length === 0 &&
+                        {checkListData[cardId]?.length === 0 &&
                             !isLoading.data && (
                                 <Typography sx={{ textAlign: "center", py: 2 }}>
                                     No checklists found
                                 </Typography>
                             )}
-                        {checkListData[cardID]?.map((checklist) => (
+                        {checkListData[cardId]?.map((checklist) => (
                             <ChecklistCard
                                 key={checklist.id}
                                 checklist={checklist}
                                 dispatch={dispatch}
-                                cardId={cardID}
+                                cardId={cardId}
                             />
                         ))}
                     </List>
