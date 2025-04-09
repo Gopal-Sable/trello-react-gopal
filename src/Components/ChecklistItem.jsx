@@ -1,9 +1,12 @@
 import { ListItem, Checkbox, ListItemText, Button } from "@mui/material";
 import { checklistAPIs } from "../utils/apiCalls";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { deleteCheckItem, toggleCheckItem } from "../features/checklistSlice";
 
-export const ChecklistItem = ({ item, dispatch, checklistId, cardId }) => {
+export const ChecklistItem = ({ item, checklistId, cardId }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
     const handleToggleItem = async (itemId, currentState) => {
         try {
             await checklistAPIs.toggleChecklistItem(
@@ -12,10 +15,7 @@ export const ChecklistItem = ({ item, dispatch, checklistId, cardId }) => {
                 itemId,
                 currentState
             );
-            dispatch({
-                type: "TOGGLE_CHECKITEM",
-                payload: { checklistId, checkItemId: itemId },
-            });
+            dispatch(toggleCheckItem({ checklistId, checkItemId: itemId }));
         } catch (err) {
             console.error("Failed to update item", err);
         }
@@ -25,10 +25,7 @@ export const ChecklistItem = ({ item, dispatch, checklistId, cardId }) => {
         try {
             setIsLoading(true);
             await checklistAPIs.deleteChecklistItem(checklistId, itemId);
-            dispatch({
-                type: "DELETE_ITEM",
-                payload: { id: checklistId, checkedId: itemId },
-            });
+            dispatch(deleteCheckItem({ id: checklistId, checkedId: itemId }));
         } catch (err) {
             console.error("Failed to delete item", err);
         }

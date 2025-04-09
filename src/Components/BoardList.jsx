@@ -1,13 +1,15 @@
 import { Box, Skeleton, Typography } from "@mui/material";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import AddNewBoardModal from "./AddNewModal";
 import AddIcon from "@mui/icons-material/Add";
 import { boardAPIs } from "../utils/apiCalls";
-import boardsReducer from "../Reducers/reducer";
 import BoardCard from "./BoardCard";
+import { useDispatch, useSelector } from "react-redux";
+import { addBoard, setBoards } from "../features/boardSlice";
 
 const BoardList = () => {
-    const [boards, dispatch] = useReducer(boardsReducer, []);
+    const dispatch = useDispatch();
+    const boards = useSelector((store) => store.board);
     const [loading, setLoading] = useState(true);
 
     const createBoard = async (name) => {
@@ -15,14 +17,15 @@ const BoardList = () => {
         if (error) {
             return alert("Error creating board", error);
         }
-        dispatch({ type: "ADD_DATA", payload: data });
+        dispatch(addBoard(data));
     };
 
     useEffect(() => {
         (async () => {
             try {
-                const { data } = await boardAPIs.getAllBoards();
-                dispatch({ type: "SET_DATA", payload: data });
+                const { data, error } = await boardAPIs.getAllBoards();
+                if (error) throw Error(error);
+                dispatch(setBoards(data));
             } catch (error) {
                 console.error("Fetch error:", error);
             } finally {
@@ -30,7 +33,6 @@ const BoardList = () => {
             }
         })();
     }, []);
-
 
     return (
         <Box sx={{ p: 4, minHeight: "100vh", bgcolor: "grey.100" }}>
@@ -76,8 +78,8 @@ const BoardList = () => {
                               sx={{ borderRadius: 2 }}
                           />
                       ))
-                    //   showing all boards
-                    : boards.map((board) => (
+                    : //   showing all boards
+                      boards.map((board) => (
                           <BoardCard key={board.id} {...board} />
                       ))}
             </Box>

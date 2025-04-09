@@ -13,13 +13,16 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import React, { useState } from "react";
 import ChecklistModal from "./ChecklistModal";
 import { cardAPIs } from "../utils/apiCalls";
+import { useDispatch } from "react-redux";
+import { removeCard, toggleCard } from "../features/cardSlice";
 
-const CardComponent = ({ id, name, dueComplete, dispatch }) => {
-    const deleteCard = async (id) => {
+const CardComponent = ({ id, name, dueComplete }) => {
+    const dispatch = useDispatch();
+    const deleteCard = async (cardId) => {
         try {
             setIsLoading(true);
             await cardAPIs.deleteCard(id);
-            dispatch({ type: "REMOVE_DATA", payload: id });
+            dispatch(removeCard({id,cardId}));
         } catch (error) {
             alert("Something went wrong!");
         } finally {
@@ -30,7 +33,7 @@ const CardComponent = ({ id, name, dueComplete, dispatch }) => {
     const toggleComplete = async (cardId, dueComplete) => {
         try {
             await cardAPIs.toggleComplete(cardId, dueComplete);
-            dispatch({ type: "CHECK_CARD", payload: cardId });
+            dispatch(toggleCard({id,data:cardId}));
         } catch (error) {
             alert("Error occurred");
         }

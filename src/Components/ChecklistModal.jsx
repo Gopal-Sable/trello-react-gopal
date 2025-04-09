@@ -11,6 +11,8 @@ import {
 import { ChecklistCard } from "./ChecklistCard";
 import { checklistAPIs } from "../utils/apiCalls";
 import checklistReducer from "../Reducers/reducer";
+import { useDispatch, useSelector } from "react-redux";
+import { addChecklist, setChecklists } from "../features/checklistSlice";
 
 const modalStyle = {
     position: "absolute",
@@ -28,12 +30,13 @@ const modalStyle = {
 
 const ChecklistModal = ({ cardId, name }) => {
     const [open, setOpen] = useState(false);
+    const checkListData = useSelector((store) => store.checklist);
+    const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState({
         data: false,
         creteList: false,
     });
     const [error, setError] = useState(null);
-    const [checkListData, dispatch] = useReducer(checklistReducer, []);
     const [newChecklistName, setNewChecklistName] = useState("");
 
     useEffect(() => {
@@ -42,7 +45,7 @@ const ChecklistModal = ({ cardId, name }) => {
                 try {
                     setIsLoading((prev) => ({ ...prev, data: true }));
                     const { data } = await checklistAPIs.getChecklists(cardId);
-                    dispatch({ type: "SET_DATA", payload: data });
+                    dispatch(setChecklists({id:cardId,data}));
                 } catch (err) {
                     setError("Failed to load checklists");
                     console.error(err);
@@ -50,7 +53,7 @@ const ChecklistModal = ({ cardId, name }) => {
                     setIsLoading((prev) => ({ ...prev, data: false }));
                 }
             };
-            fetchData();
+         fetchData();
         }
     }, [open, cardId]);
 
@@ -65,7 +68,7 @@ const ChecklistModal = ({ cardId, name }) => {
                 cardId,
                 newChecklistName
             );
-            dispatch({ type: "ADD_DATA", payload: data });
+            dispatch(addChecklist({id:cardId,data}))
         } catch (err) {
             setError("Failed to create checklist");
             console.error(err);
@@ -116,12 +119,12 @@ const ChecklistModal = ({ cardId, name }) => {
 
                     {/* display all checklists  */}
                     <List sx={{ width: "100%" }}>
-                        {checkListData.length === 0 && !isLoading.data && (
+                        {checkListData[cardId].length === 0 && !isLoading.data && (
                             <Typography sx={{ textAlign: "center", py: 2 }}>
                                 No checklists found
                             </Typography>
                         )}
-                        {checkListData.map((checklist) => (
+                        {checkListData[cardId].map((checklist) => (
                             <ChecklistCard
                                 key={checklist.id}
                                 checklist={checklist}

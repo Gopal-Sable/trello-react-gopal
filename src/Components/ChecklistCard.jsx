@@ -10,9 +10,12 @@ import {
 import { ChecklistItem } from "./ChecklistItem";
 import { checklistAPIs } from "../utils/apiCalls";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addCheckItem, removeChecklist } from "../features/checklistSlice";
 
 //  this is  checklist
-export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
+export const ChecklistCard = ({ checklist, cardId }) => {
+    const dispatch = useDispatch();
     const [newItemName, setNewItemName] = useState("");
     const [isLoading, setIsLoading] = useState({
         add: false,
@@ -30,7 +33,9 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
         try {
             setIsLoading((prev) => ({ ...prev, delete: true }));
             await checklistAPIs.deleteChecklist(checklist.id);
-            dispatch({ type: "REMOVE_DATA", payload: checklist.id });
+            dispatch(
+                removeChecklist({ id: cardId, checklistId: checklist.id })
+            );
         } catch (err) {
             console.error("Failed to delete checklist", err);
         }
@@ -45,10 +50,7 @@ export const ChecklistCard = ({ checklist, dispatch, cardId }) => {
                 checklist.id,
                 newItemName
             );
-            dispatch({
-                type: "CREATE_ITEM",
-                payload: { id: checklist.id, data },
-            });
+            dispatch(addCheckItem({ cardId, id: checklist.id, data }));
             setNewItemName("");
         } catch (err) {
             console.error("Failed to create item", err);
