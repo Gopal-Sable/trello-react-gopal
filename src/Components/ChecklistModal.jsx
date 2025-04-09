@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Box,
     Modal,
@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { ChecklistCard } from "./ChecklistCard";
 import { checklistAPIs } from "../utils/apiCalls";
-import checklistReducer from "../Reducers/reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { addChecklist, setChecklists } from "../features/checklistSlice";
 
@@ -36,26 +35,27 @@ const ChecklistModal = ({ cardId, name }) => {
         data: false,
         creteList: false,
     });
+    const [cardID, setCardID] = useState(cardId);
     const [error, setError] = useState(null);
     const [newChecklistName, setNewChecklistName] = useState("");
 
     useEffect(() => {
-        if (open && cardId) {
-            const fetchData = async () => {
-                try {
-                    setIsLoading((prev) => ({ ...prev, data: true }));
-                    const { data } = await checklistAPIs.getChecklists(cardId);
-                    dispatch(setChecklists({id:cardId,data}));
-                } catch (err) {
-                    setError("Failed to load checklists");
-                    console.error(err);
-                } finally {
-                    setIsLoading((prev) => ({ ...prev, data: false }));
-                }
-            };
-         fetchData();
-        }
-    }, [open, cardId]);
+        // if (open && cardId) {
+        const fetchData = async () => {
+            try {
+                setIsLoading((prev) => ({ ...prev, data: true }));
+                const { data } = await checklistAPIs.getChecklists(cardID);
+                dispatch(setChecklists({ id: cardID, data }));
+            } catch (err) {
+                setError("Failed to load checklists");
+                console.error(err);
+            } finally {
+                setIsLoading((prev) => ({ ...prev, data: false }));
+            }
+        };
+        fetchData();
+        // }
+    }, []);
 
     const handleCreateChecklist = async () => {
         if (!newChecklistName.trim()) {
@@ -65,10 +65,10 @@ const ChecklistModal = ({ cardId, name }) => {
         try {
             setIsLoading((prev) => ({ ...prev, creteList: true }));
             const { data } = await checklistAPIs.createChecklist(
-                cardId,
+                cardID,
                 newChecklistName
             );
-            dispatch(addChecklist({id:cardId,data}))
+            dispatch(addChecklist({ id: cardID, data }));
         } catch (err) {
             setError("Failed to create checklist");
             console.error(err);
@@ -119,17 +119,18 @@ const ChecklistModal = ({ cardId, name }) => {
 
                     {/* display all checklists  */}
                     <List sx={{ width: "100%" }}>
-                        {checkListData[cardId].length === 0 && !isLoading.data && (
-                            <Typography sx={{ textAlign: "center", py: 2 }}>
-                                No checklists found
-                            </Typography>
-                        )}
-                        {checkListData[cardId].map((checklist) => (
+                        {checkListData[cardID]?.length === 0 &&
+                            !isLoading.data && (
+                                <Typography sx={{ textAlign: "center", py: 2 }}>
+                                    No checklists found
+                                </Typography>
+                            )}
+                        {checkListData[cardID]?.map((checklist) => (
                             <ChecklistCard
                                 key={checklist.id}
                                 checklist={checklist}
                                 dispatch={dispatch}
-                                cardId={cardId}
+                                cardId={cardID}
                             />
                         ))}
                     </List>

@@ -15,7 +15,9 @@ export const ChecklistItem = ({ item, checklistId, cardId }) => {
                 itemId,
                 currentState
             );
-            dispatch(toggleCheckItem({ checklistId, checkItemId: itemId }));
+            dispatch(
+                toggleCheckItem({ cardId, checklistId, checkItemId: itemId })
+            );
         } catch (err) {
             console.error("Failed to update item", err);
         }
@@ -25,7 +27,10 @@ export const ChecklistItem = ({ item, checklistId, cardId }) => {
         try {
             setIsLoading(true);
             await checklistAPIs.deleteChecklistItem(checklistId, itemId);
-            dispatch(deleteCheckItem({ id: checklistId, checkedId: itemId }));
+            // const { checklistId, checkItemId, cardId }
+            dispatch(
+                deleteCheckItem({ checklistId, checkItemId: itemId, cardId })
+            );
         } catch (err) {
             console.error("Failed to delete item", err);
         }

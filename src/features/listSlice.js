@@ -10,10 +10,11 @@ const listSlice = createSlice({
         addList: (state, action) => {
             state[action.payload.id].push(action.payload.data);
         },
-        removeList: (state, action) =>
-            (state[action.payload.id] = state[action.payload.id].filter(
+        removeList: (state, action) => {
+            state[action.payload.id] = state[action.payload.id].filter(
                 (list) => list.id !== action.payload.data
-            )),
+            );
+        },
     },
 });
 

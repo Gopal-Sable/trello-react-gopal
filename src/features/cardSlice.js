@@ -8,15 +8,15 @@ const cardSlice = createSlice({
             state[action.payload.id] = action.payload.data;
         },
         addCard: (state, action) => {
-            state[action.payload.id].push(action.payload.data);
+            state[action.payload.id]?.push(action.payload.data);
         },
         removeCard: (state, action) => {
-            state[action.payload.id] = state[action.payload.id].filter(
+            state[action.payload.id] = state[action.payload.id]?.filter(
                 (card) => card.id !== action.payload.cardId
             );
         },
         toggleCard: (state, action) => {
-            const card = state[action.payload.id].find(
+            const card = state[action.payload.id]?.find(
                 (card) => card.id === action.payload.data
             );
             if (card) card.dueComplete = !card.dueComplete;

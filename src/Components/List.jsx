@@ -20,8 +20,8 @@ const ListComponent = ({ listName, id }) => {
       dispatch(setCards({id,data}));
     };
     fetchCards();
-  }, [id, dispatch]);
-
+  }, []);
+  // id, dispatch
   const handleAddCard = async () => {
     if (!cardName.trim()) return;
     setLoading(true);
@@ -37,7 +37,7 @@ const ListComponent = ({ listName, id }) => {
       <ListSubheader sx={{ fontWeight: 600 }}>{listName}</ListSubheader>
       
       {cards[id]?.map((card) => (
-        <CardComponent key={card.id} {...card} />
+        <CardComponent key={card.id} {...card} listId={id} />
       ))}
 
       {showAddCard ? (

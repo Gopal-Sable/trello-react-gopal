@@ -16,13 +16,13 @@ import { cardAPIs } from "../utils/apiCalls";
 import { useDispatch } from "react-redux";
 import { removeCard, toggleCard } from "../features/cardSlice";
 
-const CardComponent = ({ id, name, dueComplete }) => {
+const CardComponent = ({ id, name, dueComplete, listId }) => {
     const dispatch = useDispatch();
     const deleteCard = async (cardId) => {
         try {
             setIsLoading(true);
             await cardAPIs.deleteCard(id);
-            dispatch(removeCard({id,cardId}));
+            dispatch(removeCard({ id: listId, cardId }));
         } catch (error) {
             alert("Something went wrong!");
         } finally {
@@ -33,7 +33,7 @@ const CardComponent = ({ id, name, dueComplete }) => {
     const toggleComplete = async (cardId, dueComplete) => {
         try {
             await cardAPIs.toggleComplete(cardId, dueComplete);
-            dispatch(toggleCard({id,data:cardId}));
+            dispatch(toggleCard({ id: listId, data: cardId }));
         } catch (error) {
             alert("Error occurred");
         }

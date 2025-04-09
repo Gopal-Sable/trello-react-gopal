@@ -21,7 +21,7 @@ const BoardList = () => {
     };
 
     useEffect(() => {
-        (async () => {
+        const fetch = async () => {
             try {
                 const { data, error } = await boardAPIs.getAllBoards();
                 if (error) throw Error(error);
@@ -31,7 +31,8 @@ const BoardList = () => {
             } finally {
                 setLoading(false);
             }
-        })();
+        };
+     fetch();
     }, []);
 
     return (
@@ -69,7 +70,7 @@ const BoardList = () => {
                     </Box>
                 </AddNewBoardModal>
                 {loading
-                    ? [...Array(6)].map((_, i) => (
+                    ? Array(6).map((_, i) => (
                           <Skeleton
                               key={i}
                               variant="rounded"

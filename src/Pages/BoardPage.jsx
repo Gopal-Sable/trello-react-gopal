@@ -24,7 +24,7 @@ const BoardPage = () => {
             setLoading(false);
         };
         fetchLists();
-    }, [id, dispatch]);
+    }, [id]);
 
     const handleCreateList = async (name) => {
         const { data, error } = await listAPIs.createList(id, name);
@@ -33,9 +33,9 @@ const BoardPage = () => {
     };
 
     const handleArchiveList = async (listId) => {
-        const { error } = await listAPIs.archiveList(id,listId);
+        const { error } = await listAPIs.archiveList(listId);
         if (error) setError(error);
-        else dispatch(removeList({ id, listId }));
+        else dispatch(removeList({ id, data:listId }));
     };
 
     if (loading) return <CircularProgress />;
@@ -67,7 +67,7 @@ const BoardPage = () => {
                             position: "absolute",
                             right: 8,
                             top: 8,
-                            zIndex: 1,
+                            zIndex: 10,
                         }}
                     >
                         <ArchiveIcon fontSize="small" />
