@@ -7,32 +7,37 @@ import BoardCard from "./BoardCard";
 import { useDispatch, useSelector } from "react-redux";
 import { addBoard, setBoards } from "../features/boardSlice";
 
+const CARD_WIDTH = 250;
+const CARD_HEIGHT = 120;
+
 const BoardList = () => {
     const dispatch = useDispatch();
-    const boards = useSelector((store) => store.board);
+    const boards = useSelector((state) => state.board);
     const [loading, setLoading] = useState(true);
 
     const createBoard = async (name) => {
         const { data, error } = await boardAPIs.createBoard(name);
-        if (error) {
-            return alert("Error creating board", error);
-        }
+        if (error) return alert("Error creating board:", error);
         dispatch(addBoard(data));
     };
 
     useEffect(() => {
-        const fetch = async () => {
+        if (boards.length > 0) {
+            setLoading(false);
+            return;
+        }
+        const fetchBoards = async () => {
             try {
                 const { data, error } = await boardAPIs.getAllBoards();
                 if (error) throw Error(error);
                 dispatch(setBoards(data));
-            } catch (error) {
-                console.error("Fetch error:", error);
+            } catch (err) {
+                console.error("Error fetching boards:", err);
             } finally {
                 setLoading(false);
             }
         };
-     fetch();
+        fetchBoards();
     }, []);
 
     return (
@@ -40,6 +45,7 @@ const BoardList = () => {
             <Typography variant="h4" fontWeight={600} mb={3}>
                 My Boards
             </Typography>
+
             <Box
                 sx={{
                     display: "grid",
@@ -54,8 +60,8 @@ const BoardList = () => {
                 >
                     <Box
                         sx={{
-                            height: 120,
-                            width: 250,
+                            height: CARD_HEIGHT,
+                            width: CARD_WIDTH,
                             borderRadius: 2,
                             bgcolor: "grey.200",
                             display: "flex",
@@ -69,19 +75,19 @@ const BoardList = () => {
                         <Typography>Create new board</Typography>
                     </Box>
                 </AddNewBoardModal>
+
                 {loading
-                    ? Array(6).map((_, i) => (
+                    ? Array.from({ length: 6 }).map((_, i) => (
                           <Skeleton
                               key={i}
                               variant="rounded"
-                              width={250}
-                              height={120}
+                              width={CARD_WIDTH}
+                              height={CARD_HEIGHT}
                               sx={{ borderRadius: 2 }}
                           />
                       ))
-                    : //   showing all boards
-                      boards.map((board) => (
-                          <BoardCard key={board.id} {...board} />
+                    : boards.map((board) => (
+                          <BoardCard key={board.id} board={board} />
                       ))}
             </Box>
         </Box>

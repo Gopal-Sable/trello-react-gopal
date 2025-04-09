@@ -2,14 +2,19 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router";
 
-const BoardCard = ({ id, name, prefs }) => {
+const CARD_WIDTH = 200;
+const CARD_HEIGHT = 120;
+
+const BoardCard = ({ board }) => {
     const navigate = useNavigate();
+    const { id, name, prefs } = board;
+
     return (
         <Box
             onClick={() => navigate(`/board/${id}`)}
             sx={{
-                height: 120,
-                width: 200,
+                height: CARD_HEIGHT,
+                width: CARD_WIDTH,
                 borderRadius: 2,
                 p: 2,
                 cursor: "pointer",
@@ -38,4 +43,4 @@ const BoardCard = ({ id, name, prefs }) => {
     );
 };
 
-export default BoardCard;
+export default React.memo(BoardCard);
