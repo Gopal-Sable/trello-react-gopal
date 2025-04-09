@@ -1,13 +1,11 @@
-import { Box, Button, IconButton, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import AddNewModal from "../Components/AddNewModal";
-import AddIcon from "@mui/icons-material/Add";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import ListComponent from "../Components/List";
 import { useDispatch, useSelector } from "react-redux";
 import { listAPIs } from "../utils/apiCalls";
-import { setLists, addList, removeList } from "../features/listSlice";
+import { setLists, addList } from "../features/listSlice";
+import CreateListButton from "../Components/List/CreateListButton";
+import ListSection from "../Components/List/ListSection";
 
 const BoardPage = () => {
     const { id } = useParams();
@@ -17,14 +15,20 @@ const BoardPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (lists[id]) {
+            setLoading(false);
+            return;
+        }
+
         const fetchLists = async () => {
             const { data, error } = await listAPIs.getLists(id);
             if (error) setError(error);
             else dispatch(setLists({ id, data }));
             setLoading(false);
         };
+
         fetchLists();
-    }, [id]);
+    }, [id, dispatch, lists]);
 
     const handleCreateList = async (name) => {
         const { data, error } = await listAPIs.createList(id, name);
@@ -32,13 +36,8 @@ const BoardPage = () => {
         else dispatch(addList({ id, data }));
     };
 
-    const handleArchiveList = async (listId) => {
-        const { error } = await listAPIs.archiveList(listId);
-        if (error) setError(error);
-        else dispatch(removeList({ id, data:listId }));
-    };
-
-    if (loading) return <CircularProgress />;
+    if (loading) return <CircularProgress sx={{ m: 4 }} />;
+    if (error) return <Typography color="error">{error}</Typography>;
 
     return (
         <Box
@@ -50,31 +49,8 @@ const BoardPage = () => {
                 minHeight: "calc(100vh - 64px)",
             }}
         >
-            <AddNewModal name="Add List" handleSubmit={handleCreateList}>
-                <Button
-                    startIcon={<AddIcon />}
-                    sx={{ minWidth: 272, justifyContent: "flex-start" }}
-                >
-                    Add another list
-                </Button>
-            </AddNewModal>
-
-            {lists[id].map((list) => (
-                <Box key={list.id} sx={{ position: "relative", minWidth: 272 }}>
-                    <IconButton
-                        onClick={() => handleArchiveList(list.id)}
-                        sx={{
-                            position: "absolute",
-                            right: 8,
-                            top: 8,
-                            zIndex: 10,
-                        }}
-                    >
-                        <ArchiveIcon fontSize="small" />
-                    </IconButton>
-                    <ListComponent listName={list.name} id={list.id} />
-                </Box>
-            ))}
+            <CreateListButton handleCreateList={handleCreateList} />
+            <ListSection boardId={id} lists={lists[id]} setError={setError} />
         </Box>
     );
 };
