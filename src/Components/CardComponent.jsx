@@ -40,7 +40,8 @@ const CardComponent = ({ id, name, dueComplete, listId }) => {
     const handleDelete = async () => {
         try {
             setIsLoading(true);
-            await cardAPIs.deleteCard(id);
+            const {error}=await cardAPIs.deleteCard(id);
+            if (error) throw new Error(error);
             dispatch(removeCard({ id: listId, cardId: id }));
         } catch (error) {
             alert("Something went wrong!");
@@ -51,7 +52,8 @@ const CardComponent = ({ id, name, dueComplete, listId }) => {
 
     const handleToggle = async () => {
         try {
-            await cardAPIs.toggleComplete(id, !dueComplete);
+            const {error}=await cardAPIs.toggleComplete(id, !dueComplete);
+            if (error) throw new Error(error);
             dispatch(toggleCard({ id: listId, data: id }));
         } catch (error) {
             alert("Error occurred");

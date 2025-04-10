@@ -33,7 +33,8 @@ export const ChecklistCard = ({ checklist, cardId }) => {
     const handleDeleteChecklist = async () => {
         try {
             setIsLoading((prev) => ({ ...prev, delete: true }));
-            await checklistAPIs.deleteChecklist(checklist.id);
+            const {error}=await checklistAPIs.deleteChecklist(checklist.id);
+            if (error) throw new Error(error);
             dispatch(
                 removeChecklist({ id: cardId, checklistId: checklist.id })
             );
@@ -47,10 +48,11 @@ export const ChecklistCard = ({ checklist, cardId }) => {
         if (!newItemName.trim()) return;
         try {
             setIsLoading((prev) => ({ ...prev, add: true }));
-            const { data } = await checklistAPIs.createChecklistItem(
+            const { data,error } = await checklistAPIs.createChecklistItem(
                 checklist.id,
                 newItemName
             );
+            if (error) throw new Error(error);
             dispatch(addCheckItem({ cardId, id: checklist.id, data }));
             setNewItemName("");
         } catch (err) {

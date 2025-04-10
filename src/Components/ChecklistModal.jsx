@@ -43,7 +43,8 @@ const ChecklistModal = ({ cardId, name }) => {
             try {
                 if (checkListData[cardId]) return;
                 setIsLoading((prev) => ({ ...prev, data: true }));
-                const { data } = await checklistAPIs.getChecklists(cardId);
+                const { data,error } = await checklistAPIs.getChecklists(cardId);
+                if (error) throw new Error(error);
                 dispatch(setChecklists({ id: cardId, data }));
             } catch (err) {
                 setError("Failed to load checklists");
@@ -62,10 +63,11 @@ const ChecklistModal = ({ cardId, name }) => {
         }
         try {
             setIsLoading((prev) => ({ ...prev, creteList: true }));
-            const { data } = await checklistAPIs.createChecklist(
+            const { data,error } = await checklistAPIs.createChecklist(
                 cardId,
                 newChecklistName
             );
+            if (error) throw new Error(error);
             dispatch(addChecklist({ id: cardId, data }));
         } catch (err) {
             setError("Failed to create checklist");

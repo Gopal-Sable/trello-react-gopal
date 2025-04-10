@@ -9,12 +9,13 @@ export const ChecklistItem = ({ item, checklistId, cardId }) => {
     const dispatch = useDispatch();
     const handleToggleItem = async (itemId, currentState) => {
         try {
-            await checklistAPIs.toggleChecklistItem(
+            const {error}=await checklistAPIs.toggleChecklistItem(
                 cardId,
                 checklistId,
                 itemId,
                 currentState
             );
+            if (error) throw new Error(error);
             dispatch(
                 toggleCheckItem({ cardId, checklistId, checkItemId: itemId })
             );
@@ -26,8 +27,8 @@ export const ChecklistItem = ({ item, checklistId, cardId }) => {
     const handleDeleteItem = async (itemId) => {
         try {
             setIsLoading(true);
-            await checklistAPIs.deleteChecklistItem(checklistId, itemId);
-            // const { checklistId, checkItemId, cardId }
+            const {error}=await checklistAPIs.deleteChecklistItem(checklistId, itemId);
+            if (error) throw new Error(error);
             dispatch(
                 deleteCheckItem({ checklistId, checkItemId: itemId, cardId })
             );
