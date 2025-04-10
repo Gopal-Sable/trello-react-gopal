@@ -35,9 +35,7 @@ const AddNewModal = ({ children, name, handleSubmit }) => {
         }
         setLoading(true);
         try {
-            const { error } = await handleSubmit(input);
-            if (error) throw new Error(error);
-
+            await handleSubmit(input);
             setOpen(false);
             setInput("");
         } catch (err) {
