@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addBoard, setBoards } from "../features/boardSlice";
 import { cardStyle } from "./style";
 
-const CARD_WIDTH = 250;
-const CARD_HEIGHT = 120;
+const CARD_WIDTH = 230;
+const CARD_HEIGHT = 150;
 
 const BoardList = () => {
     const dispatch = useDispatch();
