@@ -100,7 +100,6 @@ export const ChecklistCard = ({ checklist, cardId }) => {
                         <ChecklistItem
                             key={item.id}
                             item={item}
-                            dispatch={dispatch}
                             checklistId={checklist.id}
                             cardId={cardId}
                         />

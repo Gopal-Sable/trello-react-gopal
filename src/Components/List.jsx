@@ -1,14 +1,10 @@
 import {
-    Box,
     Card,
     ListSubheader,
-    TextField,
     Button,
-    IconButton,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import CardComponent from "./CardComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { cardAPIs } from "../utils/apiCalls";
@@ -17,12 +13,12 @@ import AddCardForm from "./Cards/AddCardform";
 
 const ListComponent = ({ listName, id }) => {
     const dispatch = useDispatch();
-    const cards = useSelector((state) => state.card[id] || []);
+    const cards = useSelector((state) => state.card[id]);
     const [showAddCard, setShowAddCard] = useState(false);
 
     useEffect(() => {
         const fetchCards = async () => {
-            if (cards.length > 0) return;
+            if (cards?.length > 0) return;
 
             const { data, error } = await cardAPIs.getAllCards(id);
             if (!error) dispatch(setCards({ id, data }));
@@ -34,7 +30,7 @@ const ListComponent = ({ listName, id }) => {
         <Card sx={{ width: 272, bgcolor: "#ebecf0", p: 1 }}>
             <ListSubheader sx={{ fontWeight: 600 }}>{listName}</ListSubheader>
 
-            {cards.map((card) => (
+            {cards?.map((card) => (
                 <CardComponent key={card.id} {...card} listId={id} />
             ))}
 

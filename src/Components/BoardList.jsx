@@ -6,6 +6,7 @@ import { boardAPIs } from "../utils/apiCalls";
 import BoardCard from "./BoardCard";
 import { useDispatch, useSelector } from "react-redux";
 import { addBoard, setBoards } from "../features/boardSlice";
+import { cardStyle } from "./style";
 
 const CARD_WIDTH = 250;
 const CARD_HEIGHT = 120;
@@ -58,19 +59,7 @@ const BoardList = () => {
                     name="Add new Board"
                     handleSubmit={createBoard}
                 >
-                    <Box
-                        sx={{
-                            height: CARD_HEIGHT,
-                            width: CARD_WIDTH,
-                            borderRadius: 2,
-                            bgcolor: "grey.200",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            "&:hover": { bgcolor: "grey.300" },
-                        }}
-                    >
+                    <Box sx={cardStyle(CARD_HEIGHT, CARD_WIDTH)}>
                         <AddIcon sx={{ mr: 1 }} />
                         <Typography>Create new board</Typography>
                     </Box>
