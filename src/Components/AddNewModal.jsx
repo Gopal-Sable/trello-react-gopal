@@ -8,7 +8,12 @@ import {
     Stack,
     IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router";
+import { listAPIs } from "../utils/apiCalls";
+import { addList } from "../features/listSlice";
+import { Close } from "@mui/icons-material";
+
 
 const modalStyle = {
     position: "absolute",
@@ -22,20 +27,26 @@ const modalStyle = {
     p: 3,
 };
 
-const AddNewModal = ({ children, name, handleSubmit }) => {
+const AddNewModal = ({ children, name}) => {
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(null);
 
-    const handleSubmitForm = async () => {
+    const dispatch = useDispatch();
+    const { id } = useParams();
+    const handleCreateList = async () => {
+        setError(null)
         if (!input.trim()) {
             setError("Name cannot be empty");
             return;
         }
         setLoading(true);
         try {
-            await handleSubmit(input);
+            const { data, error } = await listAPIs.createList(id, input.trim());
+            if (error) throw new Error(error);
+            
+            dispatch(addList(data));
             setOpen(false);
             setInput("");
         } catch (err) {
@@ -43,8 +54,8 @@ const AddNewModal = ({ children, name, handleSubmit }) => {
         } finally {
             setLoading(false);
         }
+       
     };
-
     return (
         <>
             <Box onClick={() => setOpen(true)} sx={{ cursor: "pointer" }}>
@@ -61,7 +72,7 @@ const AddNewModal = ({ children, name, handleSubmit }) => {
                     >
                         <Typography variant="h6">{name}</Typography>
                         <IconButton onClick={() => !loading && setOpen(false)}>
-                            <CloseIcon />
+                            <Close />
                         </IconButton>
                     </Stack>
 
@@ -78,7 +89,7 @@ const AddNewModal = ({ children, name, handleSubmit }) => {
                         helperText={error}
                         disabled={loading}
                         onKeyDown={(e) =>
-                            e.key === "Enter" && handleSubmitForm()
+                            e.key === "Enter" && handleCreateList()
                         }
                     />
 
@@ -96,7 +107,7 @@ const AddNewModal = ({ children, name, handleSubmit }) => {
                         </Button>
                         <Button
                             variant="contained"
-                            onClick={handleSubmitForm}
+                            onClick={handleCreateList}
                             disabled={!input.trim() || loading}
                         >
                             {loading ? "Creating..." : "Create"}
