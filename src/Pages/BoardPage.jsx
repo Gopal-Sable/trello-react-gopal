@@ -1,9 +1,7 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box} from "@mui/material";
 import { useParams } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { listAPIs } from "../utils/apiCalls";
-import { setLists, addList, setOpenBoard } from "../features/listSlice";
+import { useDispatch} from "react-redux";
+import { setOpenBoard } from "../features/listSlice";
 import CreateListButton from "../Components/List/CreateListButton";
 import ListSection from "../Components/List/ListSection";
 
@@ -11,9 +9,6 @@ const BoardPage = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     dispatch(setOpenBoard(id));
-    const [error, setError] = useState(null);
-
-    if (error) return <Typography color="error">{error}</Typography>;
 
     return (
         <Box

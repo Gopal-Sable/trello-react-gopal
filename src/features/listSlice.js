@@ -14,7 +14,6 @@ const listSlice = createSlice({
         },
         // Set all lists to a board
         setLists: (state, action) => {
-            // const { id, data } = action.payload;
             state.lists[state.openBoard] = action.payload;
         },
 

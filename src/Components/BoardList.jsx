@@ -18,7 +18,7 @@ const BoardList = () => {
 
     const createBoard = async (name) => {
         const { data, error } = await boardAPIs.createBoard(name);
-        if (error) return alert("Error creating board:", error);
+        if (error) return error;
         dispatch(addBoard(data));
     };
 

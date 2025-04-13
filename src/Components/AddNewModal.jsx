@@ -8,12 +8,7 @@ import {
     Stack,
     IconButton,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { useParams } from "react-router";
-import { listAPIs } from "../utils/apiCalls";
-import { addList } from "../features/listSlice";
 import { Close } from "@mui/icons-material";
-
 
 const modalStyle = {
     position: "absolute",
@@ -27,26 +22,23 @@ const modalStyle = {
     p: 3,
 };
 
-const AddNewModal = ({ children, name}) => {
+const AddNewModal = ({ children, name, handleSubmit }) => {
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const dispatch = useDispatch();
-    const { id } = useParams();
     const handleCreateList = async () => {
-        setError(null)
+        setError(null);
         if (!input.trim()) {
             setError("Name cannot be empty");
             return;
         }
         setLoading(true);
         try {
-            const { data, error } = await listAPIs.createList(id, input.trim());
-            if (error) throw new Error(error);
-            
-            dispatch(addList(data));
+            let err = await handleSubmit(input.trim());
+            if (err) throw new Error(err);
+
             setOpen(false);
             setInput("");
         } catch (err) {
@@ -54,7 +46,6 @@ const AddNewModal = ({ children, name}) => {
         } finally {
             setLoading(false);
         }
-       
     };
     return (
         <>

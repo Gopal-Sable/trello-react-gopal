@@ -9,7 +9,7 @@ import CardComponent from "./CardComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { cardAPIs } from "../utils/apiCalls";
 import { setCards, addCard } from "../features/cardSlice";
-import AddCardForm from "./Cards/AddCardform";
+import AddCardForm from "./Cards/AddCardForm";
 
 const ListComponent = ({ listName, id }) => {
     const dispatch = useDispatch();
